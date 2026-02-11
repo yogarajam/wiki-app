@@ -1,0 +1,42 @@
+{
+  "name": "wiki-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@editorjs/code": "^2.9.0",
+    "@editorjs/editorjs": "^2.29.0",
+    "@editorjs/header": "^2.8.1",
+    "@editorjs/image": "^2.9.0",
+    "@editorjs/inline-code": "^1.5.0",
+    "@editorjs/link": "^2.6.2",
+    "@editorjs/list": "^1.9.0",
+    "@editorjs/marker": "^1.4.0",
+    "@editorjs/paragraph": "^2.11.3",
+    "@editorjs/quote": "^2.6.0",
+    "@editorjs/table": "^2.4.5",
+    "axios": "^1.6.7",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.0",
+    "react-scripts": "5.0.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "proxy": "http://localhost:8080"
+}

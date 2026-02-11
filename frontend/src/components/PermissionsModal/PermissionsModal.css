@@ -1,0 +1,122 @@
+.permissions-modal {
+    max-width: 640px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.permissions-loading,
+.permissions-error {
+    padding: 1.5rem;
+    text-align: center;
+    color: #666;
+}
+
+.permissions-error {
+    color: #d32f2f;
+}
+
+.permissions-section {
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.permissions-section:last-of-type {
+    border-bottom: none;
+}
+
+.permissions-section h3 {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.sensitive-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+}
+
+.sensitive-label {
+    font-size: 0.875rem;
+}
+
+.no-permissions {
+    font-size: 0.85rem;
+    color: #888;
+    font-style: italic;
+}
+
+.permissions-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.permissions-table th,
+.permissions-table td {
+    padding: 0.4rem 0.5rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.permissions-table th {
+    font-weight: 600;
+    color: #555;
+    font-size: 0.8rem;
+}
+
+.remove-all-btn {
+    margin-top: 0.5rem;
+}
+
+.grant-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.grant-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.grant-radio {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.grant-select {
+    padding: 0.3rem 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    min-width: 140px;
+}
+
+.btn-danger {
+    color: #d32f2f;
+    border-color: #d32f2f;
+}
+
+.btn-danger:hover {
+    background: #ffebee;
+}
+
+.btn-warning {
+    color: #e65100;
+    border-color: #e65100;
+}
+
+.btn-warning:hover {
+    background: #fff3e0;
+}

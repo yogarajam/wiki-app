@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wiki Application - Step-by-Step Development Guide</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #dbeafe;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --bg: #ffffff;
+            --bg-alt: #f8fafc;
+            --border: #e2e8f0;
+            --success: #16a34a;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text);
+            line-height: 1.7;
+            background: var(--bg);
+        }
+        .container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+        header {
+            background: linear-gradient(135deg, #059669, #047857);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        header p { font-size: 1.1rem; opacity: 0.9; }
+        nav.toc {
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+        }
+        nav.toc h2 { font-size: 1.2rem; margin-bottom: 1rem; color: #059669; }
+        nav.toc ol { padding-left: 1.5rem; }
+        nav.toc li { margin-bottom: 0.4rem; }
+        nav.toc a { color: #059669; text-decoration: none; }
+        nav.toc a:hover { text-decoration: underline; }
+        h2 {
+            font-size: 1.8rem;
+            margin: 2.5rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #d1fae5;
+            color: #059669;
+        }
+        h3 { font-size: 1.3rem; margin: 1.5rem 0 0.75rem; }
+        h4 { font-size: 1.1rem; margin: 1.2rem 0 0.5rem; }
+        p { margin-bottom: 1rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+        li { margin-bottom: 0.3rem; }
+        code {
+            background: #f1f5f9;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+        }
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.2rem 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        .info-box {
+            background: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 1rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+        .warning-box {
+            background: #fef3c7;
+            border-left: 4px solid var(--warning);
+            padding: 1rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+        .phase {
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .phase-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .phase-number {
+            width: 32px;
+            height: 32px;
+            background: #059669;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+        .phase-title { font-size: 1.15rem; font-weight: 600; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.6rem 1rem;
+            text-align: left;
+        }
+        th { background: var(--bg-alt); font-weight: 600; }
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            margin-top: 3rem;
+        }
+        .file-tree {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Step-by-Step Development Guide</h1>
+    <p>How this wiki application was built, phase by phase, from project scaffolding to full-stack deployment</p>
+</header>
+
+<div class="container">
+
+    <nav class="toc">
+        <h2>Table of Contents</h2>
+        <ol>
+            <li><a href="#prerequisites">Prerequisites &amp; Environment Setup</a></li>
+            <li><a href="#phase1">Phase 1: Project Scaffolding &amp; Infrastructure</a></li>
+            <li><a href="#phase2">Phase 2: Data Model &amp; Repositories</a></li>
+            <li><a href="#phase3">Phase 3: Core Wiki Service &amp; API</a></li>
+            <li><a href="#phase4">Phase 4: MinIO Storage Integration</a></li>
+            <li><a href="#phase5">Phase 5: Full-Text Search &amp; Document Extraction</a></li>
+            <li><a href="#phase6">Phase 6: Security &amp; Access Control</a></li>
+            <li><a href="#phase7">Phase 7: React Frontend</a></li>
+            <li><a href="#phase8">Phase 8: Testing</a></li>
+            <li><a href="#conventions">Coding Conventions</a></li>
+        </ol>
+    </nav>
+
+    <!-- ================================================================ -->
+    <h2 id="prerequisites">1. Prerequisites &amp; Environment Setup</h2>
+
+    <h3>Required Tools</h3>
+    <table>
+        <thead><tr><th>Tool</th><th>Version</th><th>Purpose</th></tr></thead>
+        <tbody>
+            <tr><td>Java JDK</td><td>17+</td><td>Backend compilation and runtime</td></tr>
+            <tr><td>Maven</td><td>3.8+</td><td>Build tool (or use the included Maven Wrapper <code>./mvnw</code>)</td></tr>
+            <tr><td>Node.js</td><td>18+</td><td>Frontend build tooling</td></tr>
+            <tr><td>npm</td><td>9+</td><td>Frontend dependency management</td></tr>
+            <tr><td>Docker</td><td>Latest</td><td>Running PostgreSQL and MinIO</td></tr>
+            <tr><td>Docker Compose</td><td>v2+</td><td>Orchestrating infrastructure containers</td></tr>
+            <tr><td>IDE (recommended)</td><td>&mdash;</td><td>IntelliJ IDEA, VS Code, or Eclipse with Lombok plugin</td></tr>
+        </tbody>
+    </table>
+
+    <h3>Initial Setup</h3>
+    <pre><code># Clone or create the project directory
+mkdir wiki-app &amp;&amp; cd wiki-app
+
+# Start infrastructure services
+docker-compose up -d
+
+# Verify services are running
+docker-compose ps</code></pre>
+
+    <!-- ================================================================ -->
+    <h2 id="phase1">2. Phase 1: Project Scaffolding &amp; Infrastructure</h2>
+
+    <div class="phase">
+        <div class="phase-header">
+            <div class="phase-number">1</div>
+            <div class="phase-title">Create Spring Boot Project</div>
+        </div>
+        <p>Initialize the project with Spring Initializr or manually create <code>pom.xml</code> with the following starters:</p>
+        <ul>
+            <li><code>spring-boot-starter-web</code> &mdash; REST API framework</li>
+            <li><code>spring-boot-starter-data-jpa</code> &mdash; Database ORM</li>
+            <li><code>spring-boot-starter-validation</code> &mdash; Bean validation</li>
+            <li><code>spring-boot-starter-thymeleaf</code> &mdash; Server-side templates (optional)</li>
+            <li><code>spring-boot-starter-security</code> &mdash; Authentication/authorization</li>
+            <li><code>postgresql</code> &mdash; JDBC driver</li>
+            <li><code>lombok</code> &mdash; Boilerplate reduction</li>
+            <li>AWS SDK v2 (<code>s3</code>, <code>s3-transfer-manager</code>) &mdash; MinIO integration</li>
+            <li>Apache Tika (<code>tika-core</code>, <code>tika-parsers-standard-package</code>) &mdash; Document parsing</li>
+        </ul>
+        <pre><code># Key pom.xml properties
+&lt;java.version&gt;17&lt;/java.version&gt;
+&lt;aws.sdk.version&gt;2.24.0&lt;/aws.sdk.version&gt;
+&lt;tika.version&gt;2.9.1&lt;/tika.version&gt;
+&lt;testcontainers.version&gt;1.19.4&lt;/testcontainers.version&gt;</code></pre>
+    </div>
+
+    <div class="phase">
+        <div class="phase-header">
+            <div class="phase-number">2</div>
+            <div class="phase-title">Docker Compose Infrastructure</div>
+        </div>
+        <p>Create <code>docker-compose.yml</code> with three services:</p>
+        <ul>
+            <li><strong>postgres</strong> &mdash; PostgreSQL 15 Alpine with health check</li>
+            <li><strong>minio</strong> &mdash; MinIO with S3 API (port 9000) and web console (port 9001)</li>
+            <li><strong>minio-init</strong> &mdash; One-shot container that creates the <code>wiki-attachments</code> bucket using <code>mc</code> CLI</li>
+        </ul>
+        <p>Bind mounts (<code>./data/postgres/</code> and <code>./data/minio/</code>) store data directly on the host filesystem, ensuring data survives even <code>docker-compose down -v</code>.</p>
+    </div>
+
+    <div class="phase">
+        <div class="phase-header">
+            <div class="phase-number">3</div>
+            <div class="phase-title">Application Configuration</div>
+        </div>
+        <p>Create <code>src/main/resources/application.properties</code> with database, MinIO, and file upload settings. Key configuration points:</p>
+        <ul>
+            <li><code>spring.jpa.hibernate.ddl-auto=update</code> &mdash; Auto-create/update schema from entities</li>
+            <li><code>minio.endpoint</code>, <code>minio.access-key</code>, <code>minio.secret-key</code> &mdash; S3-compatible connection</li>
+            <li><code>spring.servlet.multipart.max-file-size=100MB</code> &mdash; Large file support</li>
+        </ul>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="phase2">3. Phase 2: Data Model &amp; Repositories</h2>
+
+    <div class="phase">
+        <div class="phase-header">
+            <div class="phase-number">4</div>
+            <div class="phase-title">Create JPA Entities</div>
+        </div>
+        <p>Define the following entities in <code>com.wiki.model</code>:</p>
+
+        <h4>WikiPage.java</h4>
+        <ul>
+            <li>Fields: <code>id</code>, <code>title</code>, <code>slug</code> (unique), <code>content</code> (TEXT), <code>summary</code>, <code>published</code>, <code>version</code>, <code>folder</code> (Boolean, default <code>false</code>)</li>
+            <li><strong>Folders:</strong> When <code>folder = true</code>, the page acts as an organizational container that does not hold content. The <code>folder</code> field is annotated with <code>@Builder.Default @Column(nullable = false)</code>.</li>
+            <li><strong>Hierarchy:</strong> <code>@ManyToOne parent</code> + <code>@OneToMany children</code> for tree structure</li>
+            <li><strong>Backlinks:</strong> <code>@ManyToMany linksTo</code> / <code>linkedFrom</code> via join table <code>wiki_page_links</code></li>
+            <li><strong>Attachments:</strong> <code>@OneToMany attachments</code> with cascade delete</li>
+            <li>Helper methods: <code>addChild()</code>, <code>addLinkTo()</code>, <code>getDepth()</code>, <code>getPath()</code>, <code>isRoot()</code></li>
+            <li>Database indexes on <code>slug</code> (unique), <code>parent_id</code>, and <code>title</code></li>
+        </ul>
+
+        <h4>Attachment.java</h4>
+        <ul>
+            <li>Fields: <code>id</code>, <code>originalFilename</code>, <code>objectKey</code> (unique), <code>contentType</code>, <code>fileSize</code>, <code>uploadedBy</code></li>
+            <li>Links to <code>WikiPage</code> via <code>@ManyToOne</code></li>
+        </ul>
+
+        <h4>User.java / Role.java / PagePermission.java</h4>
+        <ul>
+            <li><strong>User:</strong> username, email, password (BCrypt), displayName, enabled, accountNonLocked, roles (ManyToMany)</li>
+            <li><strong>Role:</strong> name (ROLE_ADMIN / ROLE_EDITOR / ROLE_VIEWER), description</li>
+            <li><strong>PagePermission:</strong> Links a WikiPage + User/Role + PermissionType (VIEW/EDIT/DELETE/MANAGE_PERMISSIONS/FULL_ACCESS)</li>
+        </ul>
+
+        <h4>SearchableContent.java</h4>
+        <ul>
+            <li>Stores extracted text from attachments for full-text search</li>
+            <li>Fields: <code>extractedText</code> (TEXT), <code>filename</code>, <code>contentType</code>, <code>documentTitle</code>, <code>documentAuthor</code>, <code>textLength</code>, <code>extractionStatus</code></li>
+        </ul>
+
+        <h4>DTOs: WikiPageDTO &amp; WikiPageTreeDTO</h4>
+        <ul>
+            <li>Both DTOs include a <code>folder</code> boolean field to convey folder status to the frontend</li>
+            <li><code>WikiPageDTO</code> &mdash; Flat representation used for single-page API responses</li>
+            <li><code>WikiPageTreeDTO</code> &mdash; Hierarchical representation with <code>children</code> list, used by the <code>/tree</code> endpoint</li>
+        </ul>
+    </div>
+
+    <div class="phase">
+        <div class="phase-header">
+            <div class="phase-number">5</div>
+            <div class="phase-title">Create Spring Data JPA Repositories</div>
+        </div>
+        <p>Create repository interfaces extending <code>JpaRepository</code> in <code>com.wiki.repository</code>:</p>
+        <ul>
+            <li><code>WikiPageRepository</code> &mdash; Custom queries: <code>findBySlug</code>, <code>findByTitle</code>, <code>findAllRootPages</code>, <code>findPagesLinkingTo</code>, <code>searchByTitleOrContent</code> (LEFT JOINs attachments to also match <code>a.originalFilename</code>), <code>findOrphanPages</code></li>
+            <li><code>AttachmentRepository</code> &mdash; <code>findByWikiPageId</code></li>
+            <li><code>UserRepository</code> &mdash; <code>findByUsernameWithRoles</code>, <code>existsByUsername</code></li>
+            <li><code>RoleRepository</code> &mdash; <code>findByName</code></li>
+            <li><code>PagePermissionRepository</code> &mdash; <code>hasUserPermission</code>, <code>hasRolePermission</code>, <code>countByWikiPageId</code></li>
+            <li><code>SearchableContentRepository</code> &mdash; <code>searchByContent</code>, <code>searchByContentInPage</code>, <code>countSearchableDocuments</code></li>
+        </ul>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="phase3">4. Phase 3: Core Wiki Service &amp; API</h2>
+
+    <div class="phase">
+        <div class="phase-header">
+            <div class="phase-number">6</div>
+            <div class="phase-title">WikiPageService</div>
+        </div>
+        <p>Implement the core wiki logic in <code>com.wiki.service.WikiPageService</code>:</p>
+        <ul>
+            <li><strong>Save with backlink parsing:</strong> Regex pattern <code>\[\[([^\]|]+)(?:\|[^\]]*)?\]\]</code> extracts wiki links from content</li>
+            <li><strong>Slug generation:</strong> Unicode normalization, lowercase, special character removal, hyphenation, uniqueness check</li>
+            <li><strong>Hierarchy operations:</strong> Move page with circular reference detection</li>
+            <li><strong>Delete with child promotion:</strong> Children move to the deleted page's parent</li>
+            <li><strong>Validation:</strong> Duplicate title check, required fields</li>
+            <li><strong>Folder handling:</strong> When saving a folder (<code>folder = true</code>), <code>savePage()</code> skips <code>updateBacklinks()</code> and clears content and links, since folders are organizational containers without page content</li>
+        </ul>
+    </div>
+
+    <div class="phase">
+        <div class="phase-header">
+            <div class="phase-number">7</div>
+            <div class="phase-title">WikiPageController</div>
+        </div>
+        <p>Create the REST API at <code>/api/pages</code>:</p>
+        <ul>
+            <li><code>GET /tree</code> &mdash; Returns hierarchical tree DTO, sorted with folders first (alphabetically), then pages (alphabetically), using a <code>folderFirstComparator()</code></li>
+            <li><code>GET /{id}</code>, <code>GET /slug/{slug}</code> &mdash; Single page retrieval</li>
+            <li><code>GET /{id}/backlinks</code> &mdash; Pages linking here</li>
+            <li><code>GET /search?q=</code> &mdash; Text search</li>
+            <li><code>POST</code>, <code>PUT /{id}</code>, <code>DELETE /{id}</code> &mdash; CRUD operations</li>
+            <li><code>PUT /{id}/move</code> &mdash; Move within hierarchy</li>
+        </ul>
+        <div class="info-box">
+            <strong>Folder support in the controller:</strong> The <code>createPage</code> method reads the <code>folder</code> flag from the DTO and sets content to <code>null</code> for folders. The <code>convertToDTO()</code> and <code>convertToTreeDTO()</code> methods map the <code>folder</code> field to the response.
+        </div>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="phase4">5. Phase 4: MinIO Storage Integration</h2>
+
+    <div class="phase">
+        <div class="phase-header">
+            <div class="phase-number">8</div>
+            <div class="phase-title">S3Config &amp; MinioStorageService</div>
+        </div>
+        <p><strong>S3Config:</strong> Creates an <code>S3Client</code> bean with path-style access enabled (required for MinIO).</p>
+        <p><strong>MinioStorageService:</strong></p>
+        <ul>
+            <li><strong>Simple upload</strong> &mdash; For files under 10 MB using <code>PutObjectRequest</code></li>
+            <li><strong>Multipart upload</strong> &mdash; For files over 10 MB, splitting into 5 MB+ parts with <code>CreateMultipartUpload</code> / <code>UploadPart</code> / <code>CompleteMultipartUpload</code></li>
+            <li><strong>Retry logic</strong> &mdash; Exponential backoff (2^n seconds) for connection errors, max 3 retries</li>
+            <li><strong>Error handling</strong> &mdash; Custom <code>StorageException</code> with error codes: <code>INVALID_FILE</code>, <code>UPLOAD_FAILED</code>, <code>SERVER_UNAVAILABLE</code>, <code>BUCKET_NOT_FOUND</code>, <code>FILE_NOT_FOUND</code></li>
+            <li><strong>File validation</strong> &mdash; Null check, empty check, filename sanitization</li>
+            <li><strong>Unique object keys</strong> &mdash; <code>{timestamp}-{uuid8}-{sanitized_filename}</code></li>
+        </ul>
+    </div>
+
+    <div class="phase">
+        <div class="phase-header">
+            <div class="phase-number">9</div>
+            <div class="phase-title">AttachmentController</div>
+        </div>
+        <p>REST API at <code>/api/attachments</code> for file operations:</p>
+        <ul>
+            <li><code>POST /upload</code> &mdash; Accepts <code>multipart/form-data</code> with file, optional pathPrefix and pageId</li>
+            <li><code>GET /page/{pageId}</code> &mdash; List attachments for a page</li>
+            <li><code>GET /{id}/download-url</code> &mdash; Get presigned/direct download URL</li>
+            <li><code>DELETE /{id}</code> &mdash; Delete from MinIO and database</li>
+        </ul>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="phase5">6. Phase 5: Full-Text Search &amp; Document Extraction</h2>
+
+    <div class="phase">
+        <div class="phase-header">
+            <div class="phase-number">10</div>
+            <div class="phase-title">TextExtractionService</div>
+        </div>
+        <p>Wraps Apache Tika for document text extraction:</p>
+        <ul>
+            <li>Supports 14+ MIME types (PDF, Word, Excel, PPT, ODF, RTF, HTML, XML, plain text)</li>
+            <li>Max content length: 10 million characters to prevent memory issues</li>
+            <li>Extracts metadata: title, author, created date, modified date, page count, word count</li>
+            <li>Returns <code>ExtractionResult</code> with success/error/unsupported states</li>
+        </ul>
+    </div>
+
+    <div class="phase">
+        <div class="phase-header">
+            <div class="phase-number">11</div>
+            <div class="phase-title">SearchService</div>
+        </div>
+        <ul>
+            <li><strong>Unified search</strong> &mdash; Combines wiki page search with attachment content search. The <code>searchByTitleOrContent</code> JPQL query uses a LEFT JOIN with the attachments table to match against <code>w.title</code>, <code>w.content</code>, and <code>a.originalFilename</code></li>
+            <li><strong>Async indexing</strong> &mdash; <code>@Async</code> annotation on <code>indexAttachment()</code> for non-blocking uploads</li>
+            <li><strong>Reindex support</strong> &mdash; Per-page and full reindex operations</li>
+            <li><strong>Snippet extraction</strong> &mdash; Shows search term in context with surrounding text</li>
+            <li><strong>Statistics</strong> &mdash; Track total, indexed, pending, and failed documents</li>
+        </ul>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="phase6">7. Phase 6: Security &amp; Access Control</h2>
+
+    <div class="phase">
+        <div class="phase-header">
+            <div class="phase-number">12</div>
+            <div class="phase-title">SecurityConfig</div>
+        </div>
+        <ul>
+            <li>CORS configured for <code>http://localhost:3000</code></li>
+            <li>CSRF disabled for API usage</li>
+            <li>URL-based authorization rules (public, authenticated, role-based)</li>
+            <li>Form login + HTTP Basic authentication</li>
+            <li>BCrypt password encoding</li>
+            <li>Session management: <code>IF_REQUIRED</code></li>
+        </ul>
+    </div>
+
+    <div class="phase">
+        <div class="phase-header">
+            <div class="phase-number">13</div>
+            <div class="phase-title">SecurityValidator &amp; PageSecurityService</div>
+        </div>
+        <p><strong>SecurityValidator</strong> implements SpEL-accessible methods for <code>@PreAuthorize</code>:</p>
+        <ul>
+            <li><code>canView(pageId)</code>, <code>canEdit(pageId)</code>, <code>canDelete(pageId)</code>, <code>canManagePermissions(pageId)</code></li>
+            <li>Checks: Admin bypass &rarr; page existence &rarr; explicit permissions (user, then role) &rarr; default role-based permissions</li>
+        </ul>
+        <p><strong>DataInitializer</strong> creates default roles and users on startup (skipped in test profile).</p>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="phase7">8. Phase 7: React Frontend</h2>
+
+    <div class="phase">
+        <div class="phase-header">
+            <div class="phase-number">14</div>
+            <div class="phase-title">Frontend Scaffolding</div>
+        </div>
+        <pre><code>npx create-react-app frontend
+cd frontend
+npm install @editorjs/editorjs @editorjs/header @editorjs/image \
+  @editorjs/list @editorjs/paragraph @editorjs/quote @editorjs/code \
+  @editorjs/link @editorjs/marker @editorjs/inline-code \
+  axios react-router-dom</code></pre>
+        <p>Add proxy to <code>package.json</code>:</p>
+        <pre><code>"proxy": "http://localhost:8080"</code></pre>
+    </div>
+
+    <div class="phase">
+        <div class="phase-header">
+            <div class="phase-number">15</div>
+            <div class="phase-title">API Service Layer</div>
+        </div>
+        <p>Create <code>src/services/api.js</code> with Axios-based API clients:</p>
+        <ul>
+            <li><code>wikiPageApi</code> &mdash; getPageTree, getPageById, createPage, updatePage, deletePage, movePage, getBacklinks, searchPages</li>
+            <li><code>uploadApi</code> &mdash; uploadFile (with progress callback), uploadImage (Editor.js format), getAttachments, deleteAttachment</li>
+            <li><code>adminApi</code> &mdash; getMe (current user + roles), getUsers, getRoles</li>
+            <li><code>permissionApi</code> &mdash; getPagePermissions, grantUserPermission, grantRolePermission, revokeUserPermission, revokeRolePermission, revokeAllPermissions, isSensitive, markSensitive, markPublic, getSensitivePages</li>
+            <li><code>searchAdminApi</code> &mdash; getStats, reindexAll, reindexPage</li>
+        </ul>
+    </div>
+
+    <div class="phase">
+        <div class="phase-header">
+            <div class="phase-number">16</div>
+            <div class="phase-title">React Components</div>
+        </div>
+        <h4>App.jsx</h4>
+        <p>Sets up React Router with routes: <code>/</code> (home), <code>/page/:slug</code> (page view), and a catch-all redirect. On login, calls <code>adminApi.getMe()</code> to determine if the user has the Admin role, and stores this in <code>isAdmin</code> state. Renders the <strong>Admin</strong> button in the top bar (admin only) and the <code>AdminPanel</code> modal.</p>
+
+        <h4>PageTreeSidebar</h4>
+        <ul>
+            <li>Fetches and renders the hierarchical page tree using recursive <code>TreeNode</code> components</li>
+            <li>Expand/collapse with auto-expand for first 2 levels</li>
+            <li>Search bar with 300ms debounce; search results display folder or page icons</li>
+            <li>Sidebar header has both "New Page" and "New Folder" buttons</li>
+            <li>Each tree node shows a yellow folder icon or a page icon based on the <code>folder</code> field</li>
+            <li>Folders toggle expand/collapse on click instead of loading a page</li>
+            <li>Per-node child creation offers two buttons: add child page (+) and add child folder</li>
+        </ul>
+
+        <h4>WikiEditor</h4>
+        <ul>
+            <li>Initializes Editor.js with all plugins (Header, List, Quote, Code, Image, Link, Marker, InlineCode)</li>
+            <li>Image tool configured with custom uploader that posts to <code>/api/attachments/upload</code></li>
+            <li>Drag-and-drop image support with visual drop zone overlay and progress bar</li>
+            <li>Read-only / edit mode toggle</li>
+        </ul>
+
+        <h4>WikiPage (Page View)</h4>
+        <ul>
+            <li>Combines sidebar + editor in a two-panel layout</li>
+            <li>Accepts <code>isAdmin</code> prop from <code>App.jsx</code></li>
+            <li>State management for current page, editing mode, loading/saving status</li>
+            <li>Create page modal dialog</li>
+            <li>Backlinks section showing pages that link to current page</li>
+            <li>Unsaved changes confirmation dialog</li>
+            <li><strong>Folder view:</strong> When viewing a folder, displays a folder icon, the folder title, and buttons to create a child page or subfolder (instead of the editor)</li>
+            <li><strong>Move page modal:</strong> Tree selector dialog for moving a page to a different parent (<code>showMoveModal</code> state)</li>
+            <li><strong>Permissions modal:</strong> Admin-only button in the page header opens <code>PermissionsModal</code> for managing page-level permissions (<code>showPermissionsModal</code> state)</li>
+            <li>Additional state variables: <code>isCreatingFolder</code>, <code>showMoveModal</code>, <code>showPermissionsModal</code></li>
+        </ul>
+
+        <h4>PermissionsModal</h4>
+        <ul>
+            <li>Fetches page permissions, sensitive status, users, and roles on mount</li>
+            <li>Sensitive toggle: mark page as sensitive or public</li>
+            <li>Permissions table with per-row revoke buttons and a "Remove All" option</li>
+            <li>Grant form with user/role radio toggle, dropdown select, permission type dropdown, and Grant button</li>
+        </ul>
+
+        <h4>AdminPanel</h4>
+        <ul>
+            <li>Rendered by <code>App.jsx</code> when the Admin button is clicked</li>
+            <li>Displays search index stats in a 4-card grid (total, indexed, pending, failed)</li>
+            <li>Reindex actions: "Reindex All" button and per-page reindex with page ID input</li>
+            <li>Lists all sensitive page IDs</li>
+        </ul>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="phase8">9. Phase 8: Testing</h2>
+
+    <div class="phase">
+        <div class="phase-header">
+            <div class="phase-number">17</div>
+            <div class="phase-title">Backend Test Suite</div>
+        </div>
+        <table>
+            <thead><tr><th>Test Class</th><th>Coverage</th></tr></thead>
+            <tbody>
+                <tr><td><code>WikiPageServiceTest</code></td><td>Page CRUD, slug generation, hierarchy management, backlink parsing, broken link detection</td></tr>
+                <tr><td><code>MinioStorageServiceTest</code></td><td>File upload, download, delete using Testcontainers with real MinIO</td></tr>
+                <tr><td><code>MinioStorageServiceErrorHandlingTest</code></td><td>Retry logic, connection errors, file validation, error code mapping</td></tr>
+                <tr><td><code>TextExtractionServiceTest</code></td><td>Tika extraction for supported and unsupported file types</td></tr>
+                <tr><td><code>SecurityValidatorTest</code></td><td>Permission checks: admin bypass, role-based, explicit user/role permissions</td></tr>
+            </tbody>
+        </table>
+        <pre><code># Run all tests
+./mvnw test
+
+# Run a specific test class
+./mvnw test -Dtest=WikiPageServiceTest
+
+# Run with verbose output
+./mvnw test -Dspring-boot.run.arguments=--logging.level.com.wiki=DEBUG</code></pre>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="conventions">10. Coding Conventions</h2>
+
+    <h3>Backend</h3>
+    <ul>
+        <li>Package structure: <code>com.wiki.{config,controller,dto,exception,model,repository,security,service}</code></li>
+        <li>Use Lombok annotations (<code>@Getter</code>, <code>@Setter</code>, <code>@Builder</code>, <code>@RequiredArgsConstructor</code>, <code>@Slf4j</code>)</li>
+        <li>DTOs for API responses (never expose JPA entities directly to REST clients)</li>
+        <li><code>@Transactional</code> on service methods; <code>readOnly = true</code> for queries</li>
+        <li>Section comments (<code>// ==================== Section ====================</code>) for code organization</li>
+        <li>Comprehensive Javadoc on public methods</li>
+    </ul>
+
+    <h3>Frontend</h3>
+    <ul>
+        <li>Functional components with hooks (<code>useState</code>, <code>useEffect</code>, <code>useCallback</code>, <code>useRef</code>)</li>
+        <li>Component folders: <code>ComponentName/ComponentName.jsx</code> + <code>.css</code> + <code>index.js</code></li>
+        <li>API calls centralized in <code>services/api.js</code></li>
+        <li>CSS modules per component</li>
+    </ul>
+
+    <h3>Project Utility Files</h3>
+    <ul>
+        <li><code>backup.sh</code> &mdash; Creates a timestamped backup archive of PostgreSQL and MinIO data</li>
+        <li><code>restore.sh</code> &mdash; Restores the database and MinIO data from a backup archive</li>
+        <li><code>.gitignore</code> &mdash; Excludes <code>data/</code>, <code>target/</code>, <code>.idea/</code>, <code>frontend/node_modules/</code>, and <code>.DS_Store</code></li>
+    </ul>
+
+    <h3>Project File Tree</h3>
+    <div class="file-tree">
+wiki-app/
+├── backup.sh
+├── restore.sh
+├── .gitignore
+├── docker-compose.yml
+├── pom.xml
+├── data/                          <span style="color:#94a3b8;">// bind mount target for postgres &amp; minio (gitignored)</span>
+│   ├── postgres/
+│   └── minio/
+├── src/
+│   ├── main/
+│   │   ├── java/com/wiki/
+│   │   │   ├── config/
+│   │   │   ├── controller/       <span style="color:#94a3b8;">// AdminController, AttachmentController, PermissionController, SearchController, WikiPageController</span>
+│   │   │   ├── dto/
+│   │   │   ├── exception/
+│   │   │   ├── model/
+│   │   │   ├── repository/
+│   │   │   ├── security/
+│   │   │   └── service/
+│   │   └── resources/
+│   └── test/
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── AdminPanel/       <span style="color:#94a3b8;">// Search stats, reindex, sensitive pages</span>
+│   │   │   ├── PermissionsModal/ <span style="color:#94a3b8;">// Page permission management UI</span>
+│   │   │   ├── WikiEditor/
+│   │   │   └── PageTreeSidebar/
+│   │   ├── pages/
+│   │   └── services/
+│   └── package.json
+└── docs/
+    </div>
+
+</div>
+
+<footer>
+    <p>Wiki Application &mdash; Development Guide &mdash; Generated February 2026</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wiki Application - API Reference</title>
+    <style>
+        :root {
+            --primary: #dc2626;
+            --primary-light: #fef2f2;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --bg: #ffffff;
+            --bg-alt: #f8fafc;
+            --border: #e2e8f0;
+            --success: #16a34a;
+            --success-light: #dcfce7;
+            --warning: #d97706;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+            --get: #2563eb;
+            --get-light: #dbeafe;
+            --post: #16a34a;
+            --post-light: #dcfce7;
+            --put: #d97706;
+            --put-light: #fef3c7;
+            --delete: #dc2626;
+            --delete-light: #fef2f2;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text);
+            line-height: 1.7;
+            background: var(--bg);
+        }
+        .container { max-width: 960px; margin: 0 auto; padding: 2rem; }
+        header {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        header p { font-size: 1.1rem; opacity: 0.9; }
+        nav.toc {
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+        }
+        nav.toc h2 { font-size: 1.2rem; margin-bottom: 1rem; color: var(--primary); }
+        nav.toc ol { padding-left: 1.5rem; }
+        nav.toc li { margin-bottom: 0.4rem; }
+        nav.toc a { color: var(--primary); text-decoration: none; }
+        nav.toc a:hover { text-decoration: underline; }
+        h2 {
+            font-size: 1.8rem;
+            margin: 2.5rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-light);
+            color: var(--primary);
+        }
+        h3 { font-size: 1.3rem; margin: 1.5rem 0 0.75rem; }
+        h4 { font-size: 1.1rem; margin: 1rem 0 0.5rem; }
+        p { margin-bottom: 1rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+        li { margin-bottom: 0.3rem; }
+        code {
+            background: #f1f5f9;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+        }
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.2rem 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        pre code { background: none; padding: 0; color: inherit; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.5rem 0.75rem;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        th { background: var(--bg-alt); font-weight: 600; }
+        .endpoint {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            overflow: hidden;
+        }
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.25rem;
+            background: var(--bg-alt);
+            border-bottom: 1px solid var(--border);
+        }
+        .method-badge {
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            text-transform: uppercase;
+            color: white;
+        }
+        .method-get { background: var(--get); }
+        .method-post { background: var(--post); }
+        .method-put { background: var(--put); }
+        .method-delete { background: var(--delete); }
+        .endpoint-path {
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .endpoint-auth {
+            margin-left: auto;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            background: #f1f5f9;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+        }
+        .endpoint-body {
+            padding: 1.25rem;
+        }
+        .endpoint-body p:last-child { margin-bottom: 0; }
+        .param-table th:first-child { width: 20%; }
+        .param-table th:nth-child(2) { width: 15%; }
+        .param-table th:nth-child(3) { width: 10%; }
+        .info-box {
+            background: #dbeafe;
+            border-left: 4px solid #2563eb;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>REST API Reference</h1>
+    <p>Complete documentation of all API endpoints with request/response examples</p>
+</header>
+
+<div class="container">
+
+    <nav class="toc">
+        <h2>Table of Contents</h2>
+        <ol>
+            <li><a href="#auth-info">Authentication</a></li>
+            <li><a href="#pages-api">Wiki Pages API</a></li>
+            <li><a href="#attachments-api">Attachments API</a></li>
+            <li><a href="#search-api">Search API</a></li>
+            <li><a href="#permissions-api">Permissions API</a></li>
+            <li><a href="#admin-api">Admin API</a></li>
+            <li><a href="#error-handling">Error Handling</a></li>
+        </ol>
+    </nav>
+
+    <div class="info-box">
+        <strong>Base URL:</strong> <code>http://localhost:8080/api</code><br>
+        <strong>Content-Type:</strong> <code>application/json</code> (unless otherwise noted)
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="auth-info">1. Authentication</h2>
+
+    <p>The API supports two authentication methods:</p>
+
+    <h4>HTTP Basic Authentication</h4>
+    <pre><code>curl -u admin:admin123 http://localhost:8080/api/pages/1</code></pre>
+
+    <h4>Form Login (Session-Based)</h4>
+    <pre><code>curl -c cookies.txt -X POST http://localhost:8080/api/auth/login \
+  -d "username=admin&amp;password=admin123"
+
+# Use session cookie for subsequent requests
+curl -b cookies.txt http://localhost:8080/api/pages/1</code></pre>
+
+    <h4>Logout</h4>
+    <pre><code>curl -b cookies.txt -X POST http://localhost:8080/api/auth/logout</code></pre>
+
+    <!-- ================================================================ -->
+    <h2 id="pages-api">2. Wiki Pages API</h2>
+
+    <!-- GET /api/pages/tree -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-path">/api/pages/tree</span>
+            <span class="endpoint-auth">Public</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Returns the full hierarchical page tree structure.</p>
+            <h4>Response</h4>
+            <pre><code>[
+  {
+    "id": 1,
+    "title": "Documentation",
+    "slug": "documentation",
+    "folder": true,
+    "children": [
+      {
+        "id": 2,
+        "title": "Installation",
+        "slug": "installation",
+        "folder": false,
+        "children": []
+      }
+    ]
+  }
+]</code></pre>
+            <div class="info-box">Tree nodes are sorted with folders first (alphabetically), then pages (alphabetically) at each level.</div>
+        </div>
+    </div>
+
+    <!-- GET /api/pages/{id} -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-path">/api/pages/{id}</span>
+            <span class="endpoint-auth">Authenticated</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Get a single page by its numeric ID.</p>
+            <table class="param-table">
+                <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><code>id</code></td><td>Long (path)</td><td>Yes</td><td>Page ID</td></tr>
+                </tbody>
+            </table>
+            <h4>Response (200)</h4>
+            <pre><code>{
+  "id": 1,
+  "title": "Getting Started",
+  "slug": "getting-started",
+  "content": "{\"blocks\":[{\"type\":\"paragraph\",\"data\":{\"text\":\"Welcome...\"}}]}",
+  "version": 3,
+  "published": false,
+  "folder": false,
+  "parentId": null,
+  "createdAt": "2026-02-01T10:00:00",
+  "updatedAt": "2026-02-08T15:30:00"
+}</code></pre>
+            <h4>Response (404)</h4>
+            <p>Empty body with 404 status code if page not found.</p>
+        </div>
+    </div>
+
+    <!-- GET /api/pages/slug/{slug} -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-path">/api/pages/slug/{slug}</span>
+            <span class="endpoint-auth">Public</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Get a page by its URL-friendly slug.</p>
+            <table class="param-table">
+                <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><code>slug</code></td><td>String (path)</td><td>Yes</td><td>URL slug (e.g., <code>getting-started</code>)</td></tr>
+                </tbody>
+            </table>
+            <h4>Response</h4>
+            <p>Same format as GET by ID (includes <code>folder</code> field).</p>
+        </div>
+    </div>
+
+    <!-- GET /api/pages/{id}/backlinks -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-path">/api/pages/{id}/backlinks</span>
+            <span class="endpoint-auth">Authenticated</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Get all pages that contain internal links (<code>[[PageTitle]]</code>) pointing to this page.</p>
+            <h4>Response</h4>
+            <pre><code>[
+  {
+    "id": 5,
+    "title": "Architecture Overview",
+    "slug": "architecture-overview",
+    "content": "...",
+    "version": 2
+  }
+]</code></pre>
+        </div>
+    </div>
+
+    <!-- GET /api/pages/search -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-path">/api/pages/search?q={query}</span>
+            <span class="endpoint-auth">Public</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Search pages by title, content, or attachment filename.</p>
+            <table class="param-table">
+                <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><code>q</code></td><td>String (query)</td><td>Yes</td><td>Search query</td></tr>
+                </tbody>
+            </table>
+            <h4>Response</h4>
+            <p>Array of matching WikiPageDTO objects.</p>
+        </div>
+    </div>
+
+    <!-- POST /api/pages -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-post">POST</span>
+            <span class="endpoint-path">/api/pages</span>
+            <span class="endpoint-auth">Editor / Admin</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Create a new wiki page. Slug is auto-generated from the title.</p>
+            <h4>Request Body</h4>
+            <pre><code>{
+  "title": "New Page Title",
+  "content": "{\"blocks\":[]}",
+  "parentId": 1,
+  "folder": false
+}</code></pre>
+            <table class="param-table">
+                <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><code>title</code></td><td>String</td><td>Yes</td><td>Page title (must be unique)</td></tr>
+                    <tr><td><code>content</code></td><td>String</td><td>No</td><td>Editor.js JSON content</td></tr>
+                    <tr><td><code>parentId</code></td><td>Long</td><td>No</td><td>Parent page ID (null for root)</td></tr>
+                    <tr><td><code>folder</code></td><td>Boolean</td><td>No</td><td>If true, creates a folder (no content). Default: false.</td></tr>
+                </tbody>
+            </table>
+            <div class="info-box">When <code>folder</code> is true, the <code>content</code> field is ignored and set to null.</div>
+            <h4>Response (201 Created)</h4>
+            <p>The created WikiPageDTO with generated <code>id</code> and <code>slug</code>.</p>
+        </div>
+    </div>
+
+    <!-- PUT /api/pages/{id} -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-put">PUT</span>
+            <span class="endpoint-path">/api/pages/{id}</span>
+            <span class="endpoint-auth">Editor / Admin</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Update an existing page. Increments the version number. Re-parses content for backlinks.</p>
+            <h4>Request Body</h4>
+            <pre><code>{
+  "title": "Updated Title",
+  "content": "{\"blocks\":[{\"type\":\"paragraph\",\"data\":{\"text\":\"Updated content\"}}]}"
+}</code></pre>
+            <h4>Response (200)</h4>
+            <p>The updated WikiPageDTO.</p>
+        </div>
+    </div>
+
+    <!-- PUT /api/pages/{id}/move -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-put">PUT</span>
+            <span class="endpoint-path">/api/pages/{id}/move</span>
+            <span class="endpoint-auth">Editor / Admin</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Move a page to a new parent in the hierarchy. Validates against circular references.</p>
+            <h4>Request Body</h4>
+            <pre><code>{
+  "parentId": 5
+}</code></pre>
+            <p>Set <code>parentId</code> to <code>null</code> to make it a root page.</p>
+        </div>
+    </div>
+
+    <!-- DELETE /api/pages/{id} -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-delete">DELETE</span>
+            <span class="endpoint-path">/api/pages/{id}</span>
+            <span class="endpoint-auth">Admin</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Delete a page. Children are re-parented to the deleted page's parent. Attachments are cascade deleted.</p>
+            <h4>Response (204 No Content)</h4>
+            <p>Empty body on success.</p>
+        </div>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="attachments-api">3. Attachments API</h2>
+
+    <!-- POST /api/attachments/upload -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-post">POST</span>
+            <span class="endpoint-path">/api/attachments/upload</span>
+            <span class="endpoint-auth">Editor / Admin</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Upload a file to MinIO storage. Content-Type must be <code>multipart/form-data</code>.</p>
+            <table class="param-table">
+                <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><code>file</code></td><td>File (form)</td><td>Yes</td><td>The file to upload (max 100MB)</td></tr>
+                    <tr><td><code>pathPrefix</code></td><td>String (form)</td><td>No</td><td>Storage path prefix (e.g., <code>pages/42/images</code>)</td></tr>
+                    <tr><td><code>pageId</code></td><td>Long (form)</td><td>No</td><td>Wiki page to attach the file to</td></tr>
+                </tbody>
+            </table>
+            <h4>Example</h4>
+            <pre><code>curl -u editor:editor123 -X POST http://localhost:8080/api/attachments/upload \
+  -F "file=@document.pdf" \
+  -F "pathPrefix=pages/1/docs" \
+  -F "pageId=1"</code></pre>
+            <h4>Response (200)</h4>
+            <pre><code>{
+  "success": true,
+  "url": "http://localhost:9000/wiki-attachments/pages/1/docs/1707350400-a1b2c3d4-document.pdf",
+  "objectKey": "pages/1/docs/1707350400-a1b2c3d4-document.pdf",
+  "originalFilename": "document.pdf",
+  "contentType": "application/pdf",
+  "fileSize": 1048576,
+  "attachmentId": 7
+}</code></pre>
+        </div>
+    </div>
+
+    <!-- GET /api/attachments/page/{pageId} -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-path">/api/attachments/page/{pageId}</span>
+            <span class="endpoint-auth">Authenticated</span>
+        </div>
+        <div class="endpoint-body">
+            <p>List all attachments for a specific wiki page.</p>
+            <h4>Response</h4>
+            <pre><code>[
+  {
+    "id": 7,
+    "originalFilename": "document.pdf",
+    "objectKey": "pages/1/docs/1707350400-a1b2c3d4-document.pdf",
+    "contentType": "application/pdf",
+    "fileSize": 1048576,
+    "url": "http://localhost:9000/wiki-attachments/...",
+    "uploadedAt": "2026-02-08T10:00:00"
+  }
+]</code></pre>
+        </div>
+    </div>
+
+    <!-- GET /api/attachments/{id}/download-url -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-path">/api/attachments/{id}/download-url</span>
+            <span class="endpoint-auth">Authenticated</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Get a download URL for an attachment.</p>
+            <h4>Response (200)</h4>
+            <p>Plain text URL string.</p>
+        </div>
+    </div>
+
+    <!-- DELETE /api/attachments/{id} -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-delete">DELETE</span>
+            <span class="endpoint-path">/api/attachments/{id}</span>
+            <span class="endpoint-auth">Editor / Admin</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Delete an attachment. Removes from MinIO, search index, and database.</p>
+            <h4>Response (204 No Content)</h4>
+        </div>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="search-api">4. Search API</h2>
+
+    <!-- GET /api/search -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-path">/api/search?q={query}</span>
+            <span class="endpoint-auth">Authenticated</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Unified search across wiki pages and attachment document content.</p>
+            <h4>Response</h4>
+            <pre><code>{
+  "query": "deployment",
+  "totalResults": 5,
+  "pageResults": [
+    {
+      "id": 3,
+      "title": "Deployment Guide",
+      "slug": "deployment-guide",
+      "snippet": "This guide covers the deployment process...",
+      "updatedAt": "2026-02-08T12:00:00"
+    }
+  ],
+  "attachmentResults": [
+    {
+      "id": 7,
+      "filename": "deployment-checklist.pdf",
+      "contentType": "application/pdf",
+      "snippet": "...pre-deployment checklist includes verifying...",
+      "documentTitle": "Deployment Checklist",
+      "pageId": 3,
+      "pageTitle": "Deployment Guide"
+    }
+  ]
+}</code></pre>
+        </div>
+    </div>
+
+    <!-- GET /api/search/attachments -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-path">/api/search/attachments?q={query}</span>
+            <span class="endpoint-auth">Authenticated</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Search only within extracted attachment text.</p>
+        </div>
+    </div>
+
+    <!-- GET /api/search/page/{pageId}/attachments -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-path">/api/search/page/{pageId}/attachments?q={query}</span>
+            <span class="endpoint-auth">Authenticated</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Search attachments within a specific page's files only.</p>
+        </div>
+    </div>
+
+    <!-- GET /api/search/stats -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-path">/api/search/stats</span>
+            <span class="endpoint-auth">Admin</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Get search index statistics.</p>
+            <h4>Response</h4>
+            <pre><code>{
+  "totalDocuments": 42,
+  "indexedDocuments": 38,
+  "pendingDocuments": 1,
+  "failedDocuments": 3
+}</code></pre>
+        </div>
+    </div>
+
+    <!-- POST /api/search/reindex -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-post">POST</span>
+            <span class="endpoint-path">/api/search/reindex</span>
+            <span class="endpoint-auth">Admin</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Trigger a full reindex of all attachments. Runs asynchronously.</p>
+            <h4>Response (200)</h4>
+            <pre><code>"Reindex started"</code></pre>
+        </div>
+    </div>
+
+    <!-- POST /api/search/reindex/page/{pageId} -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-post">POST</span>
+            <span class="endpoint-path">/api/search/reindex/page/{pageId}</span>
+            <span class="endpoint-auth">Admin</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Reindex all attachments for a specific page.</p>
+        </div>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="permissions-api">5. Permissions API</h2>
+
+    <div class="info-box">
+        All permission endpoints require <strong>Admin</strong> role.
+    </div>
+
+    <!-- GET /api/permissions/page/{pageId} -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-path">/api/permissions/page/{pageId}</span>
+            <span class="endpoint-auth">Admin</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Get all permissions configured for a page.</p>
+            <h4>Response</h4>
+            <pre><code>[
+  {
+    "id": 1,
+    "pageId": 5,
+    "pageTitle": "Confidential Report",
+    "userId": 2,
+    "username": "editor",
+    "roleId": null,
+    "roleName": null,
+    "permissionType": "VIEW",
+    "granted": true,
+    "grantedById": 1,
+    "grantedByUsername": "admin",
+    "createdAt": "2026-02-08T10:00:00"
+  }
+]</code></pre>
+        </div>
+    </div>
+
+    <!-- POST /api/permissions/page/{pageId}/user/{userId} -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-post">POST</span>
+            <span class="endpoint-path">/api/permissions/page/{pageId}/user/{userId}</span>
+            <span class="endpoint-auth">Admin</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Grant a permission to a specific user on a page.</p>
+            <h4>Request Body</h4>
+            <pre><code>{
+  "permissionType": "EDIT"
+}</code></pre>
+            <h4>Permission Types</h4>
+            <table>
+                <thead><tr><th>Value</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><code>VIEW</code></td><td>Can view the page</td></tr>
+                    <tr><td><code>EDIT</code></td><td>Can edit the page</td></tr>
+                    <tr><td><code>DELETE</code></td><td>Can delete the page</td></tr>
+                    <tr><td><code>MANAGE_PERMISSIONS</code></td><td>Can manage page permissions</td></tr>
+                    <tr><td><code>FULL_ACCESS</code></td><td>All of the above</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- POST /api/permissions/page/{pageId}/role/{roleId} -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-post">POST</span>
+            <span class="endpoint-path">/api/permissions/page/{pageId}/role/{roleId}</span>
+            <span class="endpoint-auth">Admin</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Grant a permission to a role on a page.</p>
+            <h4>Request Body</h4>
+            <pre><code>{
+  "permissionType": "VIEW"
+}</code></pre>
+        </div>
+    </div>
+
+    <!-- DELETE /api/permissions/page/{pageId}/user/{userId} -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-delete">DELETE</span>
+            <span class="endpoint-path">/api/permissions/page/{pageId}/user/{userId}?permissionType=EDIT</span>
+            <span class="endpoint-auth">Admin</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Revoke a specific permission from a user.</p>
+        </div>
+    </div>
+
+    <!-- DELETE /api/permissions/page/{pageId}/role/{roleId} -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-delete">DELETE</span>
+            <span class="endpoint-path">/api/permissions/page/{pageId}/role/{roleId}?permissionType=VIEW</span>
+            <span class="endpoint-auth">Admin</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Revoke a specific permission from a role.</p>
+        </div>
+    </div>
+
+    <!-- DELETE /api/permissions/page/{pageId} -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-delete">DELETE</span>
+            <span class="endpoint-path">/api/permissions/page/{pageId}</span>
+            <span class="endpoint-auth">Admin</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Remove all explicit permissions from a page (makes it public again).</p>
+        </div>
+    </div>
+
+    <!-- POST /api/permissions/page/{pageId}/sensitive -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-post">POST</span>
+            <span class="endpoint-path">/api/permissions/page/{pageId}/sensitive</span>
+            <span class="endpoint-auth">Admin</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Mark a page as sensitive (restricted access).</p>
+        </div>
+    </div>
+
+    <!-- POST /api/permissions/page/{pageId}/public -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-post">POST</span>
+            <span class="endpoint-path">/api/permissions/page/{pageId}/public</span>
+            <span class="endpoint-auth">Admin</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Mark a page as public (unrestricted).</p>
+        </div>
+    </div>
+
+    <!-- GET sensitive status -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-path">/api/permissions/page/{pageId}/sensitive</span>
+            <span class="endpoint-auth">Admin</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Check if a page is marked as sensitive. Returns <code>true</code> or <code>false</code>.</p>
+        </div>
+    </div>
+
+    <!-- GET sensitive pages -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-path">/api/permissions/sensitive-pages</span>
+            <span class="endpoint-auth">Admin</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Get a set of all page IDs that have explicit permissions (sensitive pages).</p>
+            <h4>Response</h4>
+            <pre><code>[5, 12, 27]</code></pre>
+        </div>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="admin-api">6. Admin API</h2>
+
+    <div class="info-box">
+        The <code>/api/admin/me</code> endpoint is accessible to all authenticated users. All other admin endpoints require the <strong>Admin</strong> role.
+    </div>
+
+    <!-- GET /api/admin/me -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-path">/api/admin/me</span>
+            <span class="endpoint-auth">Authenticated</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Get the current authenticated user's username and roles. Used by the frontend to determine admin status.</p>
+            <h4>Response</h4>
+            <pre><code>{
+  "username": "admin",
+  "roles": ["ROLE_ADMIN"]
+}</code></pre>
+        </div>
+    </div>
+
+    <!-- GET /api/admin/users -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-path">/api/admin/users</span>
+            <span class="endpoint-auth">Admin</span>
+        </div>
+        <div class="endpoint-body">
+            <p>List all users in the system. Used by the permissions modal to populate the user dropdown.</p>
+            <h4>Response</h4>
+            <pre><code>[
+  {
+    "id": 1,
+    "username": "admin",
+    "displayName": "Administrator"
+  },
+  {
+    "id": 2,
+    "username": "editor",
+    "displayName": null
+  }
+]</code></pre>
+        </div>
+    </div>
+
+    <!-- GET /api/admin/roles -->
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-path">/api/admin/roles</span>
+            <span class="endpoint-auth">Admin</span>
+        </div>
+        <div class="endpoint-body">
+            <p>List all roles in the system. Used by the permissions modal to populate the role dropdown.</p>
+            <h4>Response</h4>
+            <pre><code>[
+  {
+    "id": 1,
+    "name": "ROLE_ADMIN",
+    "description": "Administrator with full access"
+  },
+  {
+    "id": 2,
+    "name": "ROLE_EDITOR",
+    "description": "Can create and edit pages"
+  },
+  {
+    "id": 3,
+    "name": "ROLE_VIEWER",
+    "description": "Read-only access"
+  }
+]</code></pre>
+        </div>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="error-handling">7. Error Handling</h2>
+
+    <h3>HTTP Status Codes</h3>
+    <table>
+        <thead><tr><th>Code</th><th>Meaning</th><th>When Used</th></tr></thead>
+        <tbody>
+            <tr><td><code>200</code></td><td>OK</td><td>Successful read or update</td></tr>
+            <tr><td><code>201</code></td><td>Created</td><td>Successful resource creation</td></tr>
+            <tr><td><code>204</code></td><td>No Content</td><td>Successful delete</td></tr>
+            <tr><td><code>400</code></td><td>Bad Request</td><td>Invalid input (duplicate title, missing required fields)</td></tr>
+            <tr><td><code>401</code></td><td>Unauthorized</td><td>Not authenticated</td></tr>
+            <tr><td><code>403</code></td><td>Forbidden</td><td>Insufficient permissions</td></tr>
+            <tr><td><code>404</code></td><td>Not Found</td><td>Resource not found</td></tr>
+            <tr><td><code>500</code></td><td>Internal Server Error</td><td>Unexpected server error (storage failure, etc.)</td></tr>
+        </tbody>
+    </table>
+
+    <h3>Storage Error Codes</h3>
+    <p>File upload/download failures include a machine-readable error code:</p>
+    <table>
+        <thead><tr><th>Error Code</th><th>Description</th></tr></thead>
+        <tbody>
+            <tr><td><code>INVALID_FILE</code></td><td>File is empty, null, or missing filename</td></tr>
+            <tr><td><code>UPLOAD_FAILED</code></td><td>Upload to MinIO failed after retries</td></tr>
+            <tr><td><code>SERVER_UNAVAILABLE</code></td><td>Cannot connect to MinIO</td></tr>
+            <tr><td><code>BUCKET_NOT_FOUND</code></td><td>Target S3 bucket does not exist</td></tr>
+            <tr><td><code>FILE_NOT_FOUND</code></td><td>Requested file does not exist in storage</td></tr>
+        </tbody>
+    </table>
+
+</div>
+
+<footer>
+    <p>Wiki Application &mdash; API Reference &mdash; Generated February 2026</p>
+</footer>
+
+</body>
+</html>

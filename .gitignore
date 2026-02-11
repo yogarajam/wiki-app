@@ -1,0 +1,20 @@
+# Data directories (bind mounts)
+data/
+
+# Build output
+target/
+
+# IDE
+.idea/
+*.iml
+.claude/
+
+# Node
+frontend/node_modules/
+frontend/build/
+
+# Backups
+backups/
+
+# OS
+.DS_Store

@@ -1,0 +1,124 @@
+.admin-panel-modal {
+    max-width: 560px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.admin-loading,
+.admin-error {
+    padding: 1.5rem;
+    text-align: center;
+    color: #666;
+}
+
+.admin-error {
+    color: #d32f2f;
+}
+
+.admin-section {
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.admin-section:last-of-type {
+    border-bottom: none;
+}
+
+.admin-section h3 {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+}
+
+.stat-card {
+    background: #f5f5f5;
+    border-radius: 6px;
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+    border: 1px solid #e0e0e0;
+}
+
+.stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #777;
+    margin-top: 0.15rem;
+}
+
+.stat-indexed .stat-value {
+    color: #2e7d32;
+}
+
+.stat-pending .stat-value {
+    color: #e65100;
+}
+
+.stat-failed .stat-value {
+    color: #d32f2f;
+}
+
+.admin-status-message {
+    font-size: 0.85rem;
+    color: #1565c0;
+    background: #e3f2fd;
+    padding: 0.4rem 0.75rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+}
+
+.reindex-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.reindex-page-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.reindex-input {
+    padding: 0.3rem 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    width: 100px;
+}
+
+.admin-empty {
+    font-size: 0.85rem;
+    color: #888;
+    font-style: italic;
+}
+
+.sensitive-pages-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.sensitive-page-badge {
+    display: inline-block;
+    background: #fff3e0;
+    color: #e65100;
+    border: 1px solid #ffcc80;
+    border-radius: 4px;
+    padding: 0.15rem 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+}

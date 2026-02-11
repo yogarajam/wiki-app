@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wiki Application - Architecture &amp; Design</title>
+    <style>
+        :root {
+            --primary: #0891b2;
+            --primary-light: #cffafe;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --bg: #ffffff;
+            --bg-alt: #f8fafc;
+            --border: #e2e8f0;
+            --success: #16a34a;
+            --warning: #d97706;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text);
+            line-height: 1.7;
+            background: var(--bg);
+        }
+        .container { max-width: 960px; margin: 0 auto; padding: 2rem; }
+        header {
+            background: linear-gradient(135deg, var(--primary), #0e7490);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        header p { font-size: 1.1rem; opacity: 0.9; }
+        nav.toc {
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+        }
+        nav.toc h2 { font-size: 1.2rem; margin-bottom: 1rem; color: var(--primary); }
+        nav.toc ol { padding-left: 1.5rem; }
+        nav.toc li { margin-bottom: 0.4rem; }
+        nav.toc a { color: var(--primary); text-decoration: none; }
+        nav.toc a:hover { text-decoration: underline; }
+        h2 {
+            font-size: 1.8rem;
+            margin: 2.5rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-light);
+            color: var(--primary);
+        }
+        h3 { font-size: 1.3rem; margin: 1.5rem 0 0.75rem; }
+        h4 { font-size: 1.1rem; margin: 1.2rem 0 0.5rem; }
+        p { margin-bottom: 1rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+        li { margin-bottom: 0.3rem; }
+        code {
+            background: #f1f5f9;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+        }
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.2rem 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        pre code { background: none; padding: 0; color: inherit; }
+        .info-box {
+            background: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 1rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.6rem 1rem;
+            text-align: left;
+        }
+        th { background: var(--bg-alt); font-weight: 600; }
+        .diagram {
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+        .diagram pre {
+            background: transparent;
+            color: var(--text);
+            padding: 0;
+            margin: 0;
+            font-size: 0.82rem;
+        }
+        .entity-card {
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.2rem 1.5rem;
+            margin: 1rem 0;
+        }
+        .entity-card h4 {
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 1.1rem;
+        }
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Architecture &amp; Design</h1>
+    <p>System design, data model, component architecture, and key design decisions</p>
+</header>
+
+<div class="container">
+
+    <nav class="toc">
+        <h2>Table of Contents</h2>
+        <ol>
+            <li><a href="#overview">System Overview</a></li>
+            <li><a href="#layers">Layered Architecture</a></li>
+            <li><a href="#data-model">Data Model (ER Diagram)</a></li>
+            <li><a href="#entities">Entity Details</a></li>
+            <li><a href="#backend">Backend Component Design</a></li>
+            <li><a href="#frontend">Frontend Component Design</a></li>
+            <li><a href="#security-arch">Security Architecture</a></li>
+            <li><a href="#storage">Storage Architecture</a></li>
+            <li><a href="#search-arch">Search Architecture</a></li>
+            <li><a href="#decisions">Key Design Decisions</a></li>
+        </ol>
+    </nav>
+
+    <!-- ================================================================ -->
+    <h2 id="overview">1. System Overview</h2>
+
+    <p>The Wiki Application is a three-tier web application that follows a modern full-stack architecture pattern:</p>
+
+    <div class="diagram">
+<pre>
+┌─────────────────────────────────────────────────────────────────────┐
+│                        Client (Browser)                              │
+│                   React SPA on localhost:3000                        │
+└───────────────────────────┬─────────────────────────────────────────┘
+                            │ HTTP REST (JSON)
+                            │ Proxy to :8080
+┌───────────────────────────▼─────────────────────────────────────────┐
+│                    Application Server                                │
+│               Spring Boot 3.2.2 on localhost:8080                    │
+│                                                                      │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │
+│  │  Controllers │  │  Services   │  │  Security   │  │   Config  │  │
+│  │  (REST API)  │  │ (Business)  │  │ (Auth/Authz)│  │           │  │
+│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘  └───────────┘  │
+│         │                │                │                          │
+│  ┌──────▼────────────────▼────────────────▼──────────────────────┐  │
+│  │              Spring Data JPA Repositories                      │  │
+│  └──────────────────────────┬────────────────────────────────────┘  │
+└─────────────────────────────┼────────────────────────────────────────┘
+                              │
+          ┌───────────────────┼───────────────────────┐
+          │                   │                       │
+┌─────────▼──────┐  ┌────────▼────────┐  ┌──────────▼──────────┐
+│  PostgreSQL 15  │  │   MinIO (S3)    │  │   Apache Tika       │
+│   (Data Store)  │  │ (File Storage)  │  │ (Document Parsing)  │
+│   Port: 5432    │  │  Port: 9000     │  │   (Embedded)        │
+└────────────────┘  └─────────────────┘  └─────────────────────┘
+</pre>
+    </div>
+
+    <h3>Technology Choices Rationale</h3>
+    <table>
+        <thead><tr><th>Choice</th><th>Rationale</th></tr></thead>
+        <tbody>
+            <tr><td>Spring Boot 3 + Java 17</td><td>Enterprise-grade framework with mature ecosystem, security, and JPA support</td></tr>
+            <tr><td>React 18 + Editor.js</td><td>Component-based UI with block-based rich-text editing (modern wiki editing experience)</td></tr>
+            <tr><td>PostgreSQL</td><td>Robust relational database with excellent full-text search, JSONB support, and reliability</td></tr>
+            <tr><td>MinIO</td><td>S3-compatible object storage, self-hosted, avoids cloud vendor lock-in</td></tr>
+            <tr><td>AWS SDK v2</td><td>Standard S3 SDK ensures MinIO compatibility and potential migration to AWS S3</td></tr>
+            <tr><td>Apache Tika</td><td>Industry-standard document parser supporting 1400+ file formats</td></tr>
+        </tbody>
+    </table>
+
+    <!-- ================================================================ -->
+    <h2 id="layers">2. Layered Architecture</h2>
+
+    <p>The backend follows a strict layered architecture with clear separation of concerns:</p>
+
+    <div class="diagram">
+<pre>
+Layer 1: Controllers (REST API)         &larr; HTTP Request/Response, DTO mapping
+    │
+Layer 2: Services (Business Logic)      &larr; Transactions, validation, orchestration
+    │
+Layer 3: Repositories (Data Access)     &larr; JPA queries, entity persistence
+    │
+Layer 4: Entities (Domain Model)        &larr; JPA entity classes, relationships
+    │
+Layer 5: Database / External Services   &larr; PostgreSQL, MinIO, Tika
+</pre>
+    </div>
+
+    <h3>Package Structure</h3>
+    <table>
+        <thead><tr><th>Package</th><th>Layer</th><th>Responsibility</th></tr></thead>
+        <tbody>
+            <tr><td><code>com.wiki.controller</code></td><td>Presentation</td><td>REST endpoints, request/response handling, DTO conversion</td></tr>
+            <tr><td><code>com.wiki.dto</code></td><td>Presentation</td><td>Data Transfer Objects for API contracts</td></tr>
+            <tr><td><code>com.wiki.service</code></td><td>Business</td><td>Business logic, transaction management, external integrations</td></tr>
+            <tr><td><code>com.wiki.security</code></td><td>Cross-cutting</td><td>Authentication, authorization, permission validation</td></tr>
+            <tr><td><code>com.wiki.repository</code></td><td>Data Access</td><td>Spring Data JPA repositories with custom queries</td></tr>
+            <tr><td><code>com.wiki.model</code></td><td>Domain</td><td>JPA entities representing the domain model</td></tr>
+            <tr><td><code>com.wiki.config</code></td><td>Infrastructure</td><td>Spring configuration beans, security config, S3 config</td></tr>
+            <tr><td><code>com.wiki.exception</code></td><td>Cross-cutting</td><td>Custom exceptions and global error handling</td></tr>
+        </tbody>
+    </table>
+
+    <!-- ================================================================ -->
+    <h2 id="data-model">3. Data Model (ER Diagram)</h2>
+
+    <div class="diagram">
+<pre>
+┌──────────────────┐       ┌──────────────────┐       ┌──────────────────┐
+│    wiki_pages    │       │   attachments    │       │searchable_content│
+├──────────────────┤       ├──────────────────┤       ├──────────────────┤
+│ id          PK   │&lt;──┐  │ id          PK   │&lt;──┐  │ id          PK   │
+│ title             │   │  │ original_filename│   │  │ attachment_id FK │──&gt;attachments
+│ slug        UQ   │   │  │ object_key  UQ   │   │  │ wiki_page_id FK  │──&gt;wiki_pages
+│ content     TEXT │   │  │ content_type     │   │  │ extracted_text   │
+│ summary     TEXT │   │  │ file_size        │   │  │ filename         │
+│ published        │   │  │ wiki_page_id FK  │───┘  │ content_type     │
+│ folder           │   │  │ uploaded_by      │       │ document_title   │
+│ version          │   │  │ uploaded_at      │       │ document_author  │
+│ parent_id   FK   │───┘  └──────────────────┘       │ text_length      │
+│ created_by       │                                   │ extraction_status│
+│ updated_by       │                                   │ error_message    │
+│ created_at       │                                   └──────────────────┘
+│ updated_at       │       ┌──────────────────┐
+└──────────────────┘       │ wiki_page_links  │
+                           ├──────────────────┤
+         │                 │ source_page_id FK│──&gt;wiki_pages
+         │                 │ target_page_id FK│──&gt;wiki_pages
+         │                 └──────────────────┘
+         │
+         │            ┌──────────────────┐       ┌──────────────────┐
+         │            │     users        │       │     roles        │
+         │            ├──────────────────┤       ├──────────────────┤
+         │            │ id          PK   │       │ id          PK   │
+         │            │ username    UQ   │       │ name        UQ   │
+         │            │ email       UQ   │       │ description      │
+         │            │ password         │       └──────────────────┘
+         │            │ display_name     │               │
+         │            │ enabled          │       ┌───────┴──────────┐
+         │            │ account_non_locked│       │   user_roles    │
+         │            │ created_at       │       ├──────────────────┤
+         │            │ updated_at       │       │ user_id     FK   │──&gt;users
+         │            │ last_login_at    │       │ role_id     FK   │──&gt;roles
+         │            └──────────────────┘       └──────────────────┘
+         │
+         │            ┌──────────────────┐
+         └──────────&gt; │ page_permissions │
+                      ├──────────────────┤
+                      │ id          PK   │
+                      │ wiki_page_id FK  │──&gt;wiki_pages
+                      │ user_id     FK   │──&gt;users (nullable)
+                      │ role_id     FK   │──&gt;roles (nullable)
+                      │ permission_type  │  (VIEW|EDIT|DELETE|MANAGE_PERMISSIONS|FULL_ACCESS)
+                      │ granted          │
+                      │ granted_by  FK   │──&gt;users
+                      │ created_at       │
+                      └──────────────────┘
+</pre>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="entities">4. Entity Details</h2>
+
+    <div class="entity-card">
+        <h4>WikiPage</h4>
+        <p><strong>Table:</strong> <code>wiki_pages</code> | <strong>Primary relationship hub</strong></p>
+        <ul>
+            <li><strong>Self-referential hierarchy:</strong> <code>parent_id</code> creates a tree. <code>@ManyToOne parent</code> + <code>@OneToMany children</code>. Folders and pages share the same tree structure. Folders are sorted before pages alphabetically.</li>
+            <li><strong>Folder field:</strong> <code>folder</code> (Boolean, default false). Folders are organizational containers that don't store content. They sort before pages at each tree level.</li>
+            <li><strong>Bidirectional backlinks:</strong> <code>@ManyToMany linksTo</code> via <code>wiki_page_links</code> join table. Inverse side: <code>linkedFrom</code></li>
+            <li><strong>Cascade:</strong> Attachments cascade delete. Children do NOT cascade (they are re-parented).</li>
+            <li><strong>Indexes:</strong> slug (unique), parent_id, title</li>
+        </ul>
+    </div>
+
+    <div class="entity-card">
+        <h4>Attachment</h4>
+        <p><strong>Table:</strong> <code>attachments</code> | <strong>File metadata linked to MinIO objects</strong></p>
+        <ul>
+            <li><code>objectKey</code> is the unique path in MinIO (format: <code>{timestamp}-{uuid}-{filename}</code>)</li>
+            <li>Linked to <code>WikiPage</code> via <code>wiki_page_id</code> FK</li>
+            <li>Actual file bytes stored in MinIO, not in the database</li>
+        </ul>
+    </div>
+
+    <div class="entity-card">
+        <h4>User / Role</h4>
+        <p><strong>Tables:</strong> <code>users</code>, <code>roles</code>, <code>user_roles</code> | <strong>RBAC foundation</strong></p>
+        <ul>
+            <li>Many-to-many via <code>user_roles</code> join table</li>
+            <li>Three predefined roles: ROLE_ADMIN, ROLE_EDITOR, ROLE_VIEWER</li>
+            <li>Passwords stored as BCrypt hashes</li>
+        </ul>
+    </div>
+
+    <div class="entity-card">
+        <h4>PagePermission</h4>
+        <p><strong>Table:</strong> <code>page_permissions</code> | <strong>Fine-grained page-level ACL</strong></p>
+        <ul>
+            <li>Each record grants a specific <code>PermissionType</code> to either a User OR a Role for a WikiPage</li>
+            <li>Unique constraints: <code>(wiki_page_id, user_id, permission_type)</code> and <code>(wiki_page_id, role_id, permission_type)</code></li>
+            <li>Pages with zero permission records are considered "public" (accessible by default roles)</li>
+        </ul>
+    </div>
+
+    <div class="entity-card">
+        <h4>SearchableContent</h4>
+        <p><strong>Table:</strong> <code>searchable_content</code> | <strong>Full-text search index</strong></p>
+        <ul>
+            <li>One-to-one with Attachment (each attachment has at most one searchable content record)</li>
+            <li>Stores extracted text, document metadata, and extraction status</li>
+            <li>Status lifecycle: PENDING &rarr; PROCESSING &rarr; COMPLETED | FAILED | UNSUPPORTED</li>
+        </ul>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="backend">5. Backend Component Design</h2>
+
+    <h3>Service Layer</h3>
+
+    <table>
+        <thead><tr><th>Service</th><th>Responsibility</th><th>Key Features</th></tr></thead>
+        <tbody>
+            <tr>
+                <td><code>WikiPageService</code></td>
+                <td>Wiki page lifecycle</td>
+                <td>CRUD, slug generation, hierarchy management, backlink parsing with regex, broken link detection</td>
+            </tr>
+            <tr>
+                <td><code>MinioStorageService</code></td>
+                <td>Object storage</td>
+                <td>Simple and multipart upload, retry with exponential backoff, bucket management, file validation</td>
+            </tr>
+            <tr>
+                <td><code>SearchService</code></td>
+                <td>Search and indexing</td>
+                <td>Unified search, async attachment indexing, reindex operations, snippet extraction</td>
+            </tr>
+            <tr>
+                <td><code>TextExtractionService</code></td>
+                <td>Document parsing</td>
+                <td>Apache Tika wrapper, 14+ MIME types, metadata extraction, 10M char limit</td>
+            </tr>
+            <tr>
+                <td><code>PageSecurityService</code></td>
+                <td>Permission CRUD</td>
+                <td>Grant/revoke user and role permissions, sensitive page management</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Controller Layer</h3>
+
+    <table>
+        <thead><tr><th>Controller</th><th>Base Path</th><th>Endpoints</th></tr></thead>
+        <tbody>
+            <tr><td><code>WikiPageController</code></td><td><code>/api/pages</code></td><td>9 endpoints (CRUD, tree, search, backlinks, move)</td></tr>
+            <tr><td><code>AttachmentController</code></td><td><code>/api/attachments</code></td><td>4 endpoints (upload, list, download URL, delete)</td></tr>
+            <tr><td><code>SearchController</code></td><td><code>/api/search</code></td><td>6 endpoints (unified, attachments, page-scoped, stats, reindex)</td></tr>
+            <tr><td><code>PermissionController</code></td><td><code>/api/permissions</code></td><td>10 endpoints (grant, revoke, sensitive management)</td></tr>
+            <tr><td><code>AdminController</code></td><td><code>/api/admin</code></td><td>3 endpoints (current user info, list users, list roles)</td></tr>
+        </tbody>
+    </table>
+
+    <!-- ================================================================ -->
+    <h2 id="frontend">6. Frontend Component Design</h2>
+
+    <div class="diagram">
+<pre>
+App.jsx (Router, Auth, Admin State)
+ │
+ ├── AdminPanel.jsx (Modal &mdash; admin only)
+ │    ├── Search Index Stats (total/indexed/pending/failed)
+ │    ├── Reindex Actions (all / per-page)
+ │    └── Sensitive Pages List
+ │
+ └── WikiPage.jsx (Main Page Container)
+      ├── PageTreeSidebar.jsx (Left Panel)
+      │    └── TreeNode (Recursive, folder/page icons)
+      │
+      ├── WikiEditor.jsx (Content Area - pages only)
+      │    └── Editor.js Instance
+      │         ├── Header Plugin
+      │         ├── List Plugin
+      │         ├── Quote Plugin
+      │         ├── Code Plugin
+      │         ├── Image Plugin (custom uploader)
+      │         ├── Link Plugin
+      │         ├── Marker Plugin
+      │         └── InlineCode Plugin
+      │
+      ├── Folder View (Content Area - folders only)
+      │    └── Create Page / Create Subfolder buttons
+      │
+      ├── PermissionsModal.jsx (Modal &mdash; admin only)
+      │    ├── Sensitive Toggle (public/restricted)
+      │    ├── Current Permissions Table (with revoke)
+      │    └── Grant Form (user/role + permission type)
+      │
+      └── Move Modal (Tree selector for reparenting)
+</pre>
+    </div>
+
+    <h3>State Management</h3>
+    <p>State is managed locally using React hooks (no Redux/Context). <code>App.jsx</code> manages authentication and admin state; <code>WikiPage</code> acts as the page orchestrator:</p>
+    <ul>
+        <li><code>isAdmin</code> (App) &mdash; Whether the current user has the ADMIN role (fetched via <code>/api/admin/me</code> on login)</li>
+        <li><code>showAdminPanel</code> (App) &mdash; Whether the Admin Panel modal is open</li>
+        <li><code>currentPage</code> &mdash; Currently selected page data</li>
+        <li><code>isEditing</code> / <code>isSaving</code> / <code>isLoading</code> &mdash; UI state flags</li>
+        <li><code>editedContent</code> / <code>editedTitle</code> &mdash; In-progress edit buffers</li>
+        <li><code>refreshTrigger</code> &mdash; Counter to trigger sidebar tree refresh after mutations</li>
+        <li><code>backlinks</code> &mdash; List of pages linking to current page</li>
+        <li><code>isCreatingFolder</code> &mdash; Whether the create modal is for a folder</li>
+        <li><code>showMoveModal</code> &mdash; Whether the move modal is visible</li>
+        <li><code>showPermissionsModal</code> &mdash; Whether the Permissions modal is visible (admin only)</li>
+        <li><code>moveTargets</code> &mdash; Flattened tree for the move modal selector</li>
+    </ul>
+
+    <h3>API Communication</h3>
+    <p>All API calls go through <code>services/api.js</code> which creates an Axios instance with <code>/api</code> base URL. The module exports five API namespaces: <code>wikiPageApi</code>, <code>uploadApi</code>, <code>adminApi</code>, <code>permissionApi</code>, and <code>searchAdminApi</code>. The React dev server proxy forwards requests to Spring Boot at port 8080.</p>
+
+    <!-- ================================================================ -->
+    <h2 id="security-arch">7. Security Architecture</h2>
+
+    <div class="diagram">
+<pre>
+Request Flow:
+
+HTTP Request ──&gt; CORS Filter ──&gt; Auth Filter ──&gt; URL Authorization ──&gt; Controller
+                                    │                                      │
+                           HTTP Basic /                              @PreAuthorize
+                           Form Login                             SecurityValidator
+                                    │                                      │
+                              UserDetailsService                    Permission Check:
+                                    │                              1. Admin? &rarr; Allow
+                              BCrypt Verify                        2. Page exists?
+                                    │                              3. Has explicit permissions?
+                              SecurityContext                         Yes &rarr; Check user + role grants
+                                                                     No  &rarr; Apply default role rules
+</pre>
+    </div>
+
+    <h3>Permission Resolution Algorithm</h3>
+    <ol>
+        <li>If user is <strong>Admin</strong> &rarr; always grant access</li>
+        <li>If page does <strong>not exist</strong> &rarr; deny</li>
+        <li>If page has <strong>no explicit permissions</strong> (public page):
+            <ul>
+                <li>Editors can VIEW and EDIT</li>
+                <li>Viewers can VIEW only</li>
+                <li>DELETE and MANAGE_PERMISSIONS require Admin</li>
+            </ul>
+        </li>
+        <li>If page has <strong>explicit permissions</strong> (sensitive page):
+            <ul>
+                <li>Check user-specific permission grants first</li>
+                <li>Then check role-based permission grants</li>
+                <li>Deny if no matching grant found</li>
+            </ul>
+        </li>
+    </ol>
+
+    <!-- ================================================================ -->
+    <h2 id="storage">8. Storage Architecture</h2>
+
+    <div class="diagram">
+<pre>
+Upload Flow:
+
+Client ──multipart/form-data──&gt; AttachmentController ──&gt; MinioStorageService
+                                        │                       │
+                                        │                 &lt;10MB: Simple PUT
+                                        │                 &gt;10MB: Multipart Upload
+                                        │                       │
+                                        │                       ▼
+                                        │                  ┌─────────┐
+                                        │                  │  MinIO   │
+                                        │                  │ (S3 API) │
+                                        │                  └─────────┘
+                                        │
+                                        ├──&gt; Save Attachment entity to PostgreSQL
+                                        │
+                                        └──&gt; Trigger async SearchService.indexAttachment()
+                                                    │
+                                                    ├──&gt; Download from MinIO
+                                                    ├──&gt; Extract text via Tika
+                                                    └──&gt; Save SearchableContent to PostgreSQL
+</pre>
+    </div>
+
+    <h3>Object Key Format</h3>
+    <p><code>{timestamp_ms}-{uuid_8chars}-{sanitized_filename}</code></p>
+    <p>Example: <code>pages/42/images/1707350400000-a1b2c3d4-report.pdf</code></p>
+
+    <h3>Data Persistence</h3>
+    <p>Data is stored on the host filesystem using bind mounts (<code>./data/postgres/</code> and <code>./data/minio/</code>) rather than Docker volumes, ensuring data safety.</p>
+
+    <h3>Retry Strategy</h3>
+    <p>Exponential backoff: 2s, 4s, 8s (capped at 10s). Applied to connection errors, socket timeouts, and DNS failures. Max retries: 3 (configurable).</p>
+
+    <!-- ================================================================ -->
+    <h2 id="search-arch">9. Search Architecture</h2>
+
+    <div class="diagram">
+<pre>
+Indexing Pipeline (Async):
+
+File Upload &rarr; Save Attachment &rarr; @Async indexAttachment()
+                                          │
+                                          ├─ Check if content type is supported
+                                          │  (14+ MIME types)
+                                          │
+                                          ├─ Download file from MinIO
+                                          │
+                                          ├─ Extract text via Apache Tika
+                                          │  (max 10M characters)
+                                          │
+                                          ├─ Extract metadata (title, author, dates)
+                                          │
+                                          └─ Save to searchable_content table
+                                             Status: COMPLETED | FAILED | UNSUPPORTED
+
+Search Pipeline:
+
+Search Query &rarr; SearchService.search()
+                     │
+                     ├─ Search wiki_pages (title + content LIKE)
+                     │  + attachment filenames (LEFT JOIN)
+                     │
+                     ├─ Search searchable_content (extracted_text LIKE)
+                     │
+                     └─ Merge results into SearchResults
+                        (page results + attachment results + total count)
+</pre>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="decisions">10. Key Design Decisions</h2>
+
+    <table>
+        <thead><tr><th>Decision</th><th>Choice</th><th>Rationale</th></tr></thead>
+        <tbody>
+            <tr>
+                <td>Page hierarchy model</td>
+                <td>Adjacency list (parent_id FK)</td>
+                <td>Simple, well-supported by JPA. Sufficient for typical wiki depth (5-10 levels).</td>
+            </tr>
+            <tr>
+                <td>Backlink storage</td>
+                <td>Explicit ManyToMany join table</td>
+                <td>Enables efficient backlink queries without scanning all page content.</td>
+            </tr>
+            <tr>
+                <td>File storage</td>
+                <td>MinIO (external object store)</td>
+                <td>Separates binary data from database. S3-compatible for cloud migration.</td>
+            </tr>
+            <tr>
+                <td>Search implementation</td>
+                <td>PostgreSQL LIKE queries on extracted text</td>
+                <td>Simple and sufficient for moderate data volumes. Can migrate to Elasticsearch for large scale.</td>
+            </tr>
+            <tr>
+                <td>Authentication</td>
+                <td>Session-based (HTTP Basic + Form Login)</td>
+                <td>Simple setup for internal/team wiki. Can be upgraded to JWT for stateless scaling.</td>
+            </tr>
+            <tr>
+                <td>Permission model</td>
+                <td>Hybrid: role-based default + explicit page-level grants</td>
+                <td>Most pages use simple role rules. Only sensitive pages need explicit ACL entries.</td>
+            </tr>
+            <tr>
+                <td>Editor</td>
+                <td>Editor.js (block-based)</td>
+                <td>Clean JSON output, extensible plugin system, modern editing experience.</td>
+            </tr>
+            <tr>
+                <td>Content format</td>
+                <td>Editor.js JSON stored as TEXT</td>
+                <td>Structured block data enables rendering flexibility and future migration.</td>
+            </tr>
+            <tr>
+                <td>Text extraction</td>
+                <td>Apache Tika (async)</td>
+                <td>Comprehensive format support. Async processing avoids upload latency.</td>
+            </tr>
+            <tr>
+                <td>Schema management</td>
+                <td>Hibernate <code>ddl-auto=update</code></td>
+                <td>Convenient for development. Should use Flyway/Liquibase in production.</td>
+            </tr>
+            <tr>
+                <td>Folder support</td>
+                <td>Boolean field on WikiPage</td>
+                <td>Reuses existing parent-child hierarchy. Folders sort before pages, don't store content, and use a distinct icon. Simpler than a separate entity.</td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<footer>
+    <p>Wiki Application &mdash; Architecture &amp; Design &mdash; Generated February 2026</p>
+</footer>
+
+</body>
+</html>

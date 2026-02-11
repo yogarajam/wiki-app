@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wiki Application - Build &amp; Deployment Guide</title>
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --primary-light: #ede9fe;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --bg: #ffffff;
+            --bg-alt: #f8fafc;
+            --border: #e2e8f0;
+            --success: #16a34a;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text);
+            line-height: 1.7;
+            background: var(--bg);
+        }
+        .container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+        header {
+            background: linear-gradient(135deg, var(--primary), #6d28d9);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        header p { font-size: 1.1rem; opacity: 0.9; }
+        nav.toc {
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+        }
+        nav.toc h2 { font-size: 1.2rem; margin-bottom: 1rem; color: var(--primary); }
+        nav.toc ol { padding-left: 1.5rem; }
+        nav.toc li { margin-bottom: 0.4rem; }
+        nav.toc a { color: var(--primary); text-decoration: none; }
+        nav.toc a:hover { text-decoration: underline; }
+        h2 {
+            font-size: 1.8rem;
+            margin: 2.5rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-light);
+            color: var(--primary);
+        }
+        h3 { font-size: 1.3rem; margin: 1.5rem 0 0.75rem; }
+        h4 { font-size: 1.1rem; margin: 1.2rem 0 0.5rem; }
+        p { margin-bottom: 1rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+        li { margin-bottom: 0.3rem; }
+        code {
+            background: #f1f5f9;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+        }
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.2rem 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        pre code { background: none; padding: 0; color: inherit; }
+        .info-box {
+            background: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 1rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+        .warning-box {
+            background: #fef3c7;
+            border-left: 4px solid var(--warning);
+            padding: 1rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+        .danger-box {
+            background: #fef2f2;
+            border-left: 4px solid var(--danger);
+            padding: 1rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.6rem 1rem;
+            text-align: left;
+        }
+        th { background: var(--bg-alt); font-weight: 600; }
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Build &amp; Deployment Guide</h1>
+    <p>Build, configure, and deploy the wiki application for development, staging, and production environments</p>
+</header>
+
+<div class="container">
+
+    <nav class="toc">
+        <h2>Table of Contents</h2>
+        <ol>
+            <li><a href="#dev">Development Environment</a></li>
+            <li><a href="#build">Building for Production</a></li>
+            <li><a href="#docker-deploy">Docker Deployment</a></li>
+            <li><a href="#production">Production Configuration</a></li>
+            <li><a href="#env-vars">Environment Variables Reference</a></li>
+            <li><a href="#health">Health Checks &amp; Monitoring</a></li>
+            <li><a href="#backup">Backup &amp; Recovery</a></li>
+            <li><a href="#scaling">Scaling Considerations</a></li>
+        </ol>
+    </nav>
+
+    <!-- ================================================================ -->
+    <h2 id="dev">1. Development Environment</h2>
+
+    <h3>Start Infrastructure</h3>
+    <pre><code># Start PostgreSQL and MinIO
+docker-compose up -d
+
+# Verify services
+docker-compose ps
+
+# Check MinIO health
+curl http://localhost:9000/minio/health/live
+
+# Access MinIO Console
+# Open http://localhost:9001 (minioadmin / minioadmin123)</code></pre>
+
+    <h3>Start Backend (Development Mode)</h3>
+    <pre><code># Using Maven Wrapper
+./mvnw spring-boot:run
+
+# Or with custom properties
+./mvnw spring-boot:run -Dspring-boot.run.arguments="--server.port=8080"
+
+# Or compile and run the JAR
+./mvnw package -DskipTests
+java -jar target/wiki-app-1.0.0-SNAPSHOT.jar</code></pre>
+
+    <p>The backend starts on <strong>http://localhost:8080</strong>. Spring Boot DevTools enables automatic restart on code changes.</p>
+
+    <h3>Start Frontend (Development Mode)</h3>
+    <pre><code>cd frontend
+npm install    # First time only
+npm start      # Starts on http://localhost:3000</code></pre>
+
+    <p>The React dev server proxies API requests to <code>http://localhost:8080</code> (configured in <code>package.json</code>).</p>
+
+    <div class="info-box">
+        <strong>Data Persistence with Bind Mounts:</strong> Data is stored in <code>./data/postgres/</code> and <code>./data/minio/</code> using bind mounts. This data persists across container restarts and even <code>docker-compose down</code>. Only <code>docker-compose down -v</code> with Docker volumes would lose data &mdash; but since bind mounts are used, data is safe on the host filesystem.
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="build">2. Building for Production</h2>
+
+    <h3>Build the Frontend</h3>
+    <pre><code>cd frontend
+npm run build</code></pre>
+    <p>This creates an optimized production build in <code>frontend/build/</code>. For a single-JAR deployment, copy the build output to <code>src/main/resources/static/</code>:</p>
+    <pre><code># Copy frontend build to Spring Boot static resources
+cp -r frontend/build/* src/main/resources/static/</code></pre>
+
+    <h3>Build the Backend JAR</h3>
+    <pre><code># Clean build with tests
+./mvnw clean package
+
+# Build without tests (faster)
+./mvnw clean package -DskipTests</code></pre>
+    <p>The output JAR is at <code>target/wiki-app-1.0.0-SNAPSHOT.jar</code>.</p>
+
+    <h3>Single-JAR Deployment</h3>
+    <p>To serve the frontend from Spring Boot (no separate Node.js server needed):</p>
+    <pre><code># 1. Build frontend
+cd frontend &amp;&amp; npm run build &amp;&amp; cd ..
+
+# 2. Copy to static resources
+rm -rf src/main/resources/static/*
+cp -r frontend/build/* src/main/resources/static/
+
+# 3. Build the JAR
+./mvnw clean package -DskipTests
+
+# 4. Run
+java -jar target/wiki-app-1.0.0-SNAPSHOT.jar</code></pre>
+    <p>The application serves both the API and UI from port 8080.</p>
+
+    <!-- ================================================================ -->
+    <h2 id="docker-deploy">3. Docker Deployment</h2>
+
+    <h3>Create a Dockerfile for the Application</h3>
+    <pre><code># Dockerfile
+FROM eclipse-temurin:17-jre-alpine
+
+WORKDIR /app
+
+COPY target/wiki-app-1.0.0-SNAPSHOT.jar app.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "app.jar"]</code></pre>
+
+    <h3>Build the Docker Image</h3>
+    <pre><code># Build the JAR first
+./mvnw clean package -DskipTests
+
+# Build Docker image
+docker build -t wiki-app:latest .</code></pre>
+
+    <h3>Full Stack Docker Compose (Production)</h3>
+    <p>Extend the existing <code>docker-compose.yml</code> to include the application:</p>
+    <pre><code># docker-compose.prod.yml
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: wiki-postgres
+    environment:
+      POSTGRES_DB: wikidb
+      POSTGRES_USER: wiki
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    networks:
+      - wiki-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wiki -d wikidb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:latest
+    container_name: wiki-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
+    volumes:
+      - ./data/minio:/data
+    networks:
+      - wiki-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set myminio http://minio:9000 $${MINIO_USER} $${MINIO_PASSWORD};
+      mc mb myminio/wiki-attachments --ignore-existing;
+      echo 'Bucket ready';
+      "
+    networks:
+      - wiki-network
+
+  wiki-app:
+    image: wiki-app:latest
+    container_name: wiki-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/wikidb
+      SPRING_DATASOURCE_USERNAME: wiki
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_USER}
+      MINIO_SECRET_KEY: ${MINIO_PASSWORD}
+    networks:
+      - wiki-network
+
+networks:
+  wiki-network:</code></pre>
+
+    <div class="info-box">
+        <strong>Bind Mounts:</strong> Data is stored in <code>./data/</code> on the host filesystem, surviving <code>docker-compose down -v</code>.
+    </div>
+
+    <h3>Deploy with Docker Compose</h3>
+    <pre><code># Create .env file with secrets
+cat &gt; .env &lt;&lt; EOF
+DB_PASSWORD=your_secure_db_password
+MINIO_USER=your_minio_admin
+MINIO_PASSWORD=your_minio_secret
+EOF
+
+# Deploy
+docker-compose -f docker-compose.prod.yml up -d</code></pre>
+
+    <!-- ================================================================ -->
+    <h2 id="production">4. Production Configuration</h2>
+
+    <div class="danger-box">
+        <strong>Security Checklist before going to production:</strong>
+        <ul>
+            <li>Change all default passwords (database, MinIO, application users)</li>
+            <li>Enable CSRF protection or use token-based auth (JWT)</li>
+            <li>Configure HTTPS with TLS certificates</li>
+            <li>Restrict CORS to your actual domain</li>
+            <li>Set <code>spring.jpa.hibernate.ddl-auto=validate</code> (use Flyway/Liquibase for migrations)</li>
+            <li>Disable Spring Boot DevTools</li>
+            <li>Set <code>spring.jpa.show-sql=false</code></li>
+        </ul>
+    </div>
+
+    <h3>Production application.properties Overrides</h3>
+    <pre><code># Use environment variables for secrets
+spring.datasource.url=${SPRING_DATASOURCE_URL}
+spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
+spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
+
+# Schema validation only (use migration tool)
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=false
+
+# MinIO from environment
+minio.endpoint=${MINIO_ENDPOINT}
+minio.access-key=${MINIO_ACCESS_KEY}
+minio.secret-key=${MINIO_SECRET_KEY}
+
+# Production session settings
+server.servlet.session.timeout=30m
+server.servlet.session.cookie.secure=true
+server.servlet.session.cookie.http-only=true</code></pre>
+
+    <h3>Reverse Proxy (Nginx Example)</h3>
+    <pre><code>server {
+    listen 443 ssl;
+    server_name wiki.example.com;
+
+    ssl_certificate     /etc/ssl/certs/wiki.crt;
+    ssl_certificate_key /etc/ssl/private/wiki.key;
+
+    client_max_body_size 100M;
+
+    location / {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}</code></pre>
+
+    <!-- ================================================================ -->
+    <h2 id="env-vars">5. Environment Variables Reference</h2>
+
+    <table>
+        <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+            <tr><td><code>SPRING_DATASOURCE_URL</code></td><td><code>jdbc:postgresql://localhost:5432/wikidb</code></td><td>PostgreSQL JDBC URL</td></tr>
+            <tr><td><code>SPRING_DATASOURCE_USERNAME</code></td><td><code>wiki</code></td><td>Database username</td></tr>
+            <tr><td><code>SPRING_DATASOURCE_PASSWORD</code></td><td><code>wiki123</code></td><td>Database password</td></tr>
+            <tr><td><code>MINIO_ENDPOINT</code></td><td><code>http://localhost:9000</code></td><td>MinIO S3 API URL</td></tr>
+            <tr><td><code>MINIO_ACCESS_KEY</code></td><td><code>minioadmin</code></td><td>MinIO access key</td></tr>
+            <tr><td><code>MINIO_SECRET_KEY</code></td><td><code>minioadmin123</code></td><td>MinIO secret key</td></tr>
+            <tr><td><code>MINIO_BUCKET</code></td><td><code>wiki-attachments</code></td><td>S3 bucket name</td></tr>
+            <tr><td><code>MINIO_REGION</code></td><td><code>us-east-1</code></td><td>S3 region</td></tr>
+            <tr><td><code>MINIO_MAX_RETRIES</code></td><td><code>3</code></td><td>Upload retry count</td></tr>
+            <tr><td><code>SERVER_PORT</code></td><td><code>8080</code></td><td>Application server port</td></tr>
+        </tbody>
+    </table>
+
+    <!-- ================================================================ -->
+    <h2 id="health">6. Health Checks &amp; Monitoring</h2>
+
+    <h3>Application Health</h3>
+    <pre><code># Spring Boot Actuator (if enabled)
+curl http://localhost:8080/actuator/health</code></pre>
+
+    <h3>PostgreSQL Health</h3>
+    <pre><code>docker exec wiki-postgres pg_isready -U wiki -d wikidb</code></pre>
+
+    <h3>MinIO Health</h3>
+    <pre><code>curl http://localhost:9000/minio/health/live</code></pre>
+
+    <h3>Search Index Statistics</h3>
+    <pre><code># Requires admin credentials
+curl -u admin:admin123 http://localhost:8080/api/search/stats</code></pre>
+
+    <!-- ================================================================ -->
+    <h2 id="backup">7. Backup &amp; Recovery</h2>
+
+    <h3>Backup &amp; Restore Scripts (Recommended)</h3>
+    <p>The project includes <code>backup.sh</code> and <code>restore.sh</code> scripts for automated backup and recovery.</p>
+
+    <h4>Creating a Backup</h4>
+    <pre><code># Run the backup script to create a timestamped backup in ./backups/
+./backup.sh</code></pre>
+    <p>This script performs the following:</p>
+    <ul>
+        <li>Dumps the PostgreSQL database using <code>pg_dump</code></li>
+        <li>Copies MinIO files from <code>./data/minio/</code></li>
+        <li>Compresses everything into a <code>.tar.gz</code> archive in <code>./backups/</code></li>
+    </ul>
+
+    <h4>Restoring from a Backup</h4>
+    <pre><code># Restore from a specific backup archive
+./restore.sh ./backups/wiki-backup-TIMESTAMP.tar.gz</code></pre>
+    <p>This script restores both the PostgreSQL database and MinIO files from the specified archive.</p>
+
+    <h4>Quick Bind Mount Backup</h4>
+    <p>Since the application uses bind mounts, a simple filesystem-level backup of the <code>./data/</code> directory is also possible:</p>
+    <pre><code># Backup the entire data directory
+tar -czf wiki-data-backup.tar.gz ./data/</code></pre>
+
+    <h3>Manual Backup Methods (Alternatives)</h3>
+
+    <h4>Database Backup</h4>
+    <pre><code># Backup
+docker exec wiki-postgres pg_dump -U wiki wikidb &gt; backup_$(date +%Y%m%d).sql
+
+# Restore
+docker exec -i wiki-postgres psql -U wiki wikidb &lt; backup_20260208.sql</code></pre>
+
+    <h4>MinIO Data Backup</h4>
+    <pre><code># Using MinIO Client
+mc alias set local http://localhost:9000 minioadmin minioadmin123
+mc mirror local/wiki-attachments /path/to/backup/
+
+# Restore
+mc mirror /path/to/backup/ local/wiki-attachments</code></pre>
+
+    <!-- ================================================================ -->
+    <h2 id="scaling">8. Scaling Considerations</h2>
+
+    <h3>Horizontal Scaling</h3>
+    <ul>
+        <li><strong>Stateless application:</strong> The Spring Boot app can be scaled horizontally behind a load balancer. Use sticky sessions or externalize session storage (Redis) if using form login.</li>
+        <li><strong>Database:</strong> PostgreSQL supports read replicas for scaling read-heavy workloads.</li>
+        <li><strong>MinIO:</strong> MinIO supports distributed mode for high availability and scalability.</li>
+    </ul>
+
+    <h3>Performance Tuning</h3>
+    <table>
+        <thead><tr><th>Area</th><th>Recommendation</th></tr></thead>
+        <tbody>
+            <tr><td>Database connection pool</td><td>Configure HikariCP pool size: <code>spring.datasource.hikari.maximum-pool-size=20</code></td></tr>
+            <tr><td>JPA queries</td><td>Add <code>@EntityGraph</code> or fetch joins for N+1 query prevention</td></tr>
+            <tr><td>File uploads</td><td>Use MinIO's distributed mode for parallel I/O</td></tr>
+            <tr><td>Search indexing</td><td>Configure async thread pool size in <code>AsyncConfig</code></td></tr>
+            <tr><td>Frontend</td><td>Enable gzip compression, CDN for static assets</td></tr>
+            <tr><td>JVM</td><td>Set <code>-Xmx</code> and <code>-Xms</code> flags; use G1 or ZGC for large heaps</td></tr>
+        </tbody>
+    </table>
+
+</div>
+
+<footer>
+    <p>Wiki Application &mdash; Build &amp; Deployment Guide &mdash; Generated February 2026</p>
+</footer>
+
+</body>
+</html>

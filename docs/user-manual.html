@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wiki Application - User Manual</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #dbeafe;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --bg: #ffffff;
+            --bg-alt: #f8fafc;
+            --border: #e2e8f0;
+            --success: #16a34a;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --code-bg: #f1f5f9;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text);
+            line-height: 1.7;
+            background: var(--bg);
+        }
+        .container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+        header {
+            background: linear-gradient(135deg, var(--primary), #1d4ed8);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        header p { font-size: 1.1rem; opacity: 0.9; }
+        nav.toc {
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+        }
+        nav.toc h2 { font-size: 1.2rem; margin-bottom: 1rem; color: var(--primary); }
+        nav.toc ol { padding-left: 1.5rem; }
+        nav.toc li { margin-bottom: 0.4rem; }
+        nav.toc a { color: var(--primary); text-decoration: none; }
+        nav.toc a:hover { text-decoration: underline; }
+        h2 {
+            font-size: 1.8rem;
+            margin: 2.5rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-light);
+            color: var(--primary);
+        }
+        h3 { font-size: 1.3rem; margin: 1.5rem 0 0.75rem; }
+        h4 { font-size: 1.1rem; margin: 1.2rem 0 0.5rem; }
+        p { margin-bottom: 1rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+        li { margin-bottom: 0.3rem; }
+        code {
+            background: var(--code-bg);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+        }
+        pre {
+            background: var(--code-bg);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        .info-box {
+            background: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 1rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+        .warning-box {
+            background: #fef3c7;
+            border-left: 4px solid var(--warning);
+            padding: 1rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+        .danger-box {
+            background: #fef2f2;
+            border-left: 4px solid var(--danger);
+            padding: 1rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+        .success-box {
+            background: #f0fdf4;
+            border-left: 4px solid var(--success);
+            padding: 1rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.6rem 1rem;
+            text-align: left;
+        }
+        th { background: var(--bg-alt); font-weight: 600; }
+        .step {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: var(--bg-alt);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .step-number {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        .step-content { flex: 1; }
+        .step-content h4 { margin-top: 0; }
+        img.screenshot {
+            max-width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            margin-top: 3rem;
+        }
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            header h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Wiki Application &mdash; User Manual</h1>
+    <p>A complete guide for end users on how to navigate, create, edit, search, and manage wiki pages and folders</p>
+</header>
+
+<div class="container">
+
+    <nav class="toc">
+        <h2>Table of Contents</h2>
+        <ol>
+            <li><a href="#getting-started">Getting Started</a></li>
+            <li><a href="#interface">Understanding the Interface</a></li>
+            <li><a href="#pages">Working with Pages</a></li>
+            <li><a href="#folders">Working with Folders</a></li>
+            <li><a href="#moving">Moving Pages &amp; Folders</a></li>
+            <li><a href="#editor">Using the Rich-Text Editor</a></li>
+            <li><a href="#attachments">File Attachments</a></li>
+            <li><a href="#search">Searching Content</a></li>
+            <li><a href="#backlinks">Backlinks &amp; Internal Links</a></li>
+            <li><a href="#roles">User Roles &amp; Permissions</a></li>
+            <li><a href="#admin">Admin Features</a></li>
+            <li><a href="#data">Data Storage &amp; Backups</a></li>
+            <li><a href="#tips">Tips &amp; Best Practices</a></li>
+        </ol>
+    </nav>
+
+    <!-- ================================================================ -->
+    <h2 id="getting-started">1. Getting Started</h2>
+
+    <h3>Logging In</h3>
+    <p>Open the application in your browser. If you are not already authenticated you will be prompted to log in. Enter your username and password provided by your administrator.</p>
+
+    <table>
+        <thead><tr><th>Default User</th><th>Password</th><th>Role</th></tr></thead>
+        <tbody>
+            <tr><td><code>admin</code></td><td><code>admin123</code></td><td>Administrator</td></tr>
+            <tr><td><code>editor</code></td><td><code>editor123</code></td><td>Editor</td></tr>
+            <tr><td><code>viewer</code></td><td><code>viewer123</code></td><td>Viewer (read-only)</td></tr>
+        </tbody>
+    </table>
+
+    <div class="warning-box">
+        <strong>Note:</strong> These are development defaults. In production, your administrator will provide unique credentials.
+    </div>
+
+    <h3>Logging Out</h3>
+    <p>Click the <strong>Logout</strong> button in the top bar to end your session.</p>
+
+    <!-- ================================================================ -->
+    <h2 id="interface">2. Understanding the Interface</h2>
+
+    <p>The application has two primary areas:</p>
+
+    <h3>Sidebar (Page &amp; Folder Tree)</h3>
+    <ul>
+        <li>Displays all wiki pages and folders in a <strong>hierarchical tree</strong></li>
+        <li><strong>Folders</strong> are shown with a yellow folder icon; <strong>pages</strong> are shown with a document icon</li>
+        <li>Folders always sort before pages at each level of the tree</li>
+        <li>Pages and folders with children show an expand/collapse arrow</li>
+        <li>Click a page title to view it in the main area</li>
+        <li>Click a folder to toggle expand/collapse <strong>and</strong> select it, showing the folder view in the main area</li>
+        <li>The <strong>+</strong> button at the top creates a new root-level page</li>
+        <li>The green <strong>folder</strong> button at the top creates a new root-level folder</li>
+        <li>Hovering over any tree node reveals a <strong>+</strong> button (child page) and a <strong>folder</strong> button (subfolder)</li>
+        <li>A <strong>search bar</strong> at the top lets you quickly find pages by title or by attachment filename</li>
+    </ul>
+
+    <h3>Top Bar</h3>
+    <ul>
+        <li>Displays the currently logged-in username</li>
+        <li>If logged in as an admin, an <strong>Admin</strong> button appears to open the Admin Panel</li>
+        <li><strong>Logout</strong> button to end the session</li>
+    </ul>
+
+    <h3>Main Content Area</h3>
+    <ul>
+        <li>Shows the currently selected page's title, content, and metadata</li>
+        <li><strong>Edit</strong> / <strong>Delete</strong> / <strong>Move</strong> buttons appear in the header when viewing a page or folder</li>
+        <li>If logged in as an admin, a <strong>Permissions</strong> button also appears in the header to manage page-level access</li>
+        <li>When no page is selected, a welcome screen with a "Create New Page" button is shown</li>
+        <li>When a <strong>folder</strong> is selected, a folder view is shown with the folder title, a large folder icon, and buttons to <strong>Create Page Here</strong> and <strong>Create Subfolder</strong></li>
+        <li><strong>Backlinks</strong> section appears at the bottom when other pages link to the current page</li>
+    </ul>
+
+    <!-- ================================================================ -->
+    <h2 id="pages">3. Working with Pages</h2>
+
+    <h3>Creating a New Page</h3>
+
+    <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+            <h4>Open Create Dialog</h4>
+            <p>Click the <strong>+</strong> button in the sidebar header (for a root page) or on a specific tree node (for a child page). You can also click <strong>Create Page Here</strong> from a folder's view.</p>
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+            <h4>Enter Title</h4>
+            <p>Type a descriptive title for your page. The system automatically generates a URL-friendly slug (e.g., "Getting Started Guide" becomes <code>getting-started-guide</code>).</p>
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+            <h4>Click Create</h4>
+            <p>The page is created and the editor opens in edit mode. You can immediately start adding content.</p>
+        </div>
+    </div>
+
+    <h3>Editing a Page</h3>
+    <ol>
+        <li>Select the page from the sidebar tree</li>
+        <li>Click the <strong>Edit</strong> button in the page header</li>
+        <li>The title becomes an editable text field and the editor enters edit mode</li>
+        <li>Make your changes using the rich-text editor</li>
+        <li>Click <strong>Save</strong> to persist your changes, or <strong>Cancel</strong> to discard</li>
+    </ol>
+
+    <div class="info-box">
+        <strong>Version Tracking:</strong> Every time you save, the page version is automatically incremented. You can see the current version number in the metadata area below the title.
+    </div>
+
+    <h3>Deleting a Page</h3>
+    <ol>
+        <li>Select the page from the sidebar</li>
+        <li>Click the <strong>Delete</strong> button</li>
+        <li>Confirm in the dialog that appears</li>
+    </ol>
+
+    <div class="danger-box">
+        <strong>Warning:</strong> Deletion is permanent and cannot be undone. Child pages of the deleted page are automatically moved up to the deleted page's parent (or become root pages).
+    </div>
+
+    <div class="warning-box">
+        <strong>Permissions:</strong> Only users with the <strong>Admin</strong> role can delete pages and folders. Editors can create and edit content but cannot delete it. See the <a href="#roles">Roles &amp; Permissions</a> section for details.
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="folders">4. Working with Folders</h2>
+
+    <p>Folders are organizational containers used to group related pages and subfolders. Unlike pages, folders do not have content or an editor &mdash; they exist purely to provide structure in the sidebar tree.</p>
+
+    <h3>Creating a Folder</h3>
+
+    <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+            <h4>Open Create Folder Dialog</h4>
+            <p>Click the green <strong>folder</strong> button in the sidebar header to create a root-level folder, or hover over any tree node and click the folder icon that appears to create a subfolder under that node. You can also click <strong>Create Subfolder</strong> from a folder's view in the main area.</p>
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+            <h4>Enter Folder Name</h4>
+            <p>The create modal adapts when creating a folder: the title reads <strong>"Create New Folder"</strong> and the input label reads <strong>"Folder Name"</strong>. Enter a descriptive name for the folder.</p>
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+            <h4>Click Create</h4>
+            <p>The folder is created and appears in the sidebar tree with a yellow folder icon.</p>
+        </div>
+    </div>
+
+    <h3>Folder Appearance in the Sidebar</h3>
+    <ul>
+        <li>Folders display a <strong>yellow folder icon</strong>, while pages display a <strong>document icon</strong></li>
+        <li>At each level of the tree, <strong>folders are sorted before pages</strong>, making them easy to find</li>
+        <li>Clicking a folder <strong>toggles expand/collapse</strong> of its children and also <strong>selects it</strong>, showing the folder view in the main content area</li>
+    </ul>
+
+    <h3>Folder View (Main Area)</h3>
+    <p>When a folder is selected, the main content area displays:</p>
+    <ul>
+        <li>A <strong>large folder icon</strong> and the folder title</li>
+        <li>A <strong>"Create Page Here"</strong> button to quickly add a new page inside the folder</li>
+        <li>A <strong>"Create Subfolder"</strong> button to create a nested folder</li>
+    </ul>
+
+    <h3>Deleting a Folder</h3>
+    <p>Deleting a folder works the same as deleting a page. Any children (pages and subfolders) of the deleted folder are moved up to the deleted folder's parent or become root-level items.</p>
+
+    <div class="warning-box">
+        <strong>Permissions:</strong> Only users with the <strong>Admin</strong> role can delete folders.
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="moving">5. Moving Pages &amp; Folders</h2>
+
+    <p>Pages and folders can be reorganized in the hierarchy using the Move feature in the UI.</p>
+
+    <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+            <h4>Open the Move Dialog</h4>
+            <p>Select a page or folder from the sidebar. In the page header, click the <strong>Move</strong> button (located next to the Edit and Delete buttons).</p>
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+            <h4>Choose a New Parent</h4>
+            <p>A modal appears with a tree list showing all available pages and folders as potential parents. At the top of the list, a <strong>"Root level (no parent)"</strong> option allows you to move the item to the top level. The current parent is highlighted with a <strong>"current"</strong> badge for reference.</p>
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+            <h4>Confirm the Move</h4>
+            <p>Select the desired new parent and confirm. The sidebar tree refreshes automatically to reflect the new hierarchy.</p>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <strong>Safety:</strong> The page or folder being moved, along with all of its descendants, are excluded from the list of valid move targets. This prevents creating circular hierarchies (e.g., moving a parent under its own child).
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="editor">6. Using the Rich-Text Editor</h2>
+
+    <p>The editor is powered by <strong>Editor.js</strong> and uses a block-based editing approach. Each piece of content (paragraph, heading, image, etc.) is an independent block.</p>
+
+    <h3>Available Block Types</h3>
+    <table>
+        <thead><tr><th>Block</th><th>Description</th><th>How to Use</th></tr></thead>
+        <tbody>
+            <tr><td><strong>Paragraph</strong></td><td>Standard text block</td><td>Just start typing</td></tr>
+            <tr><td><strong>Header</strong></td><td>Section headings (H1-H4)</td><td>Click <code>+</code> &rarr; Header, or type content and convert</td></tr>
+            <tr><td><strong>List</strong></td><td>Ordered or unordered lists</td><td>Click <code>+</code> &rarr; List</td></tr>
+            <tr><td><strong>Quote</strong></td><td>Block quotations with optional caption</td><td>Click <code>+</code> &rarr; Quote</td></tr>
+            <tr><td><strong>Code</strong></td><td>Code snippet block</td><td>Click <code>+</code> &rarr; Code</td></tr>
+            <tr><td><strong>Image</strong></td><td>Uploaded or linked images</td><td>Click <code>+</code> &rarr; Image, or drag-and-drop</td></tr>
+            <tr><td><strong>Link</strong></td><td>Rich link preview</td><td>Click <code>+</code> &rarr; Link</td></tr>
+        </tbody>
+    </table>
+
+    <div class="info-box">
+        <strong>Note:</strong> Folders do not have an editor. The rich-text editor is only available when editing pages.
+    </div>
+
+    <h3>Inline Formatting</h3>
+    <p>Select text within a block to see the inline toolbar:</p>
+    <ul>
+        <li><strong>Bold</strong> &mdash; <code>Ctrl+B</code></li>
+        <li><strong>Italic</strong> &mdash; <code>Ctrl+I</code></li>
+        <li><strong>Marker</strong> (highlight) &mdash; Select and choose marker from toolbar</li>
+        <li><strong>Inline Code</strong> &mdash; Wrap selected text in code formatting</li>
+        <li><strong>Link</strong> &mdash; Add a hyperlink to selected text</li>
+    </ul>
+
+    <h3>Adding and Reordering Blocks</h3>
+    <ul>
+        <li>Click the <strong>+</strong> button that appears between blocks to insert a new block</li>
+        <li>Use the six-dot handle on the left side of each block to <strong>drag and reorder</strong></li>
+        <li>Click the block menu (three dots) for options like delete, move up/down, or convert type</li>
+    </ul>
+
+    <!-- ================================================================ -->
+    <h2 id="attachments">7. File Attachments</h2>
+
+    <h3>Uploading Files</h3>
+    <p>Files can be attached to any wiki page. Supported upload methods:</p>
+    <ul>
+        <li><strong>Drag and Drop</strong> &mdash; Drag image files directly into the editor area. A blue overlay confirms the drop zone.</li>
+        <li><strong>Image Tool</strong> &mdash; Use the Editor.js image block to select and upload a file.</li>
+        <li><strong>API Upload</strong> &mdash; Upload files programmatically via <code>POST /api/attachments/upload</code>.</li>
+    </ul>
+
+    <h3>Upload Progress</h3>
+    <p>A progress bar appears at the bottom of the editor during uploads, showing the percentage completed.</p>
+
+    <h3>File Size Limits</h3>
+    <ul>
+        <li>Maximum file size: <strong>100 MB</strong></li>
+        <li>Files over 10 MB are automatically uploaded in chunks (multipart upload)</li>
+    </ul>
+
+    <h3>Viewing &amp; Downloading Attachments</h3>
+    <p>Uploaded images appear inline in the editor. Other file types can be accessed via the attachments API, which provides download URLs.</p>
+
+    <!-- ================================================================ -->
+    <h2 id="search">8. Searching Content</h2>
+
+    <h3>Quick Search (Sidebar)</h3>
+    <p>Type into the search bar in the sidebar to find pages by title. Results appear as a flat list replacing the tree view. Clear the search to return to the tree.</p>
+
+    <div class="info-box">
+        <strong>Attachment filename matching:</strong> The sidebar search also matches <strong>attachment filenames</strong> in addition to page titles. For example, searching for <strong>"passport"</strong> will find a page that has an attachment named "Yoga Passport.pdf", even if the page title itself does not contain "passport".
+    </div>
+
+    <h3>Full Search</h3>
+    <p>The search API (<code>GET /api/search?q=query</code>) performs a unified search across:</p>
+    <ul>
+        <li><strong>Wiki page titles</strong> and <strong>content</strong></li>
+        <li><strong>Attachment filenames</strong></li>
+        <li><strong>Attachment document text</strong> &mdash; PDF, Word, Excel, PowerPoint, and other supported formats are automatically indexed after upload</li>
+    </ul>
+
+    <h3>Supported Document Formats for Search</h3>
+    <table>
+        <thead><tr><th>Format</th><th>Extensions</th></tr></thead>
+        <tbody>
+            <tr><td>PDF</td><td>.pdf</td></tr>
+            <tr><td>Microsoft Word</td><td>.doc, .docx</td></tr>
+            <tr><td>Microsoft Excel</td><td>.xls, .xlsx</td></tr>
+            <tr><td>Microsoft PowerPoint</td><td>.ppt, .pptx</td></tr>
+            <tr><td>OpenDocument</td><td>.odt, .ods, .odp</td></tr>
+            <tr><td>Rich Text Format</td><td>.rtf</td></tr>
+            <tr><td>Plain Text</td><td>.txt</td></tr>
+            <tr><td>HTML / XML</td><td>.html, .xml</td></tr>
+        </tbody>
+    </table>
+
+    <!-- ================================================================ -->
+    <h2 id="backlinks">9. Backlinks &amp; Internal Links</h2>
+
+    <h3>Creating Internal Links</h3>
+    <p>Use wiki-style link syntax in your page content to link to other pages:</p>
+    <ul>
+        <li><code>[[Page Title]]</code> &mdash; Links to a page by its exact title</li>
+        <li><code>[[Page Title|Custom Display Text]]</code> &mdash; Links with alternative display text</li>
+    </ul>
+
+    <div class="info-box">
+        <strong>Example:</strong> Writing <code>[[Getting Started]]</code> in your content creates a link to the page titled "Getting Started". The system also tries matching by slug if no exact title match is found.
+    </div>
+
+    <h3>Viewing Backlinks</h3>
+    <p>When you view a page, a <strong>Backlinks</strong> section appears at the bottom listing all pages that link to the current page. Click any backlink to navigate to that page.</p>
+
+    <h3>Broken Links</h3>
+    <p>If you link to a page that does not exist, the link is stored but marked as broken. When the target page is eventually created, the link becomes active automatically.</p>
+
+    <!-- ================================================================ -->
+    <h2 id="roles">10. User Roles &amp; Permissions</h2>
+
+    <h3>Role Overview</h3>
+    <table>
+        <thead><tr><th>Role</th><th>View</th><th>Create</th><th>Edit</th><th>Delete</th><th>Manage Permissions</th><th>Admin Panel</th></tr></thead>
+        <tbody>
+            <tr><td><strong>Admin</strong></td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+            <tr><td><strong>Editor</strong></td><td>Yes</td><td>Yes</td><td>Yes</td><td>No</td><td>No</td><td>No</td></tr>
+            <tr><td><strong>Viewer</strong></td><td>Yes</td><td>No</td><td>No</td><td>No</td><td>No</td><td>No</td></tr>
+        </tbody>
+    </table>
+
+    <div class="warning-box">
+        <strong>Delete permissions:</strong> Only users with the <strong>Admin</strong> role can delete pages and folders. Editors can create new pages and folders and edit existing content, but the Delete button is not available to them. This applies to both pages and folders equally.
+    </div>
+
+    <h3>Sensitive Pages</h3>
+    <p>Admins can mark specific pages as <strong>sensitive</strong>. Sensitive pages require explicit permission grants and are not accessible by default to Editors or Viewers.</p>
+
+    <h3>Page-Level Permissions</h3>
+    <p>For sensitive pages, administrators can grant specific permissions to individual users or roles:</p>
+    <ul>
+        <li><strong>VIEW</strong> &mdash; Can read the page content</li>
+        <li><strong>EDIT</strong> &mdash; Can modify the page content</li>
+        <li><strong>DELETE</strong> &mdash; Can delete the page</li>
+        <li><strong>MANAGE_PERMISSIONS</strong> &mdash; Can change who has access</li>
+        <li><strong>FULL_ACCESS</strong> &mdash; All of the above</li>
+    </ul>
+
+    <!-- ================================================================ -->
+    <h2 id="admin">11. Admin Features</h2>
+
+    <p>Administrators have access to additional features through two UI elements that are only visible when logged in with the Admin role:</p>
+
+    <h3>Permissions Modal</h3>
+    <p>Click the <strong>Permissions</strong> button in any page or folder header to open the Permissions modal. This provides:</p>
+
+    <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+            <h4>Sensitive Toggle</h4>
+            <p>View whether the page is currently <strong>Public</strong> or <strong>Sensitive (Restricted)</strong>. Click the toggle button to switch between the two states. Sensitive pages require explicit permission grants for non-admin users to access.</p>
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+            <h4>Current Permissions Table</h4>
+            <p>View all explicit permissions granted on the page. Each row shows the target (user or role), the permission type, and a <strong>Revoke</strong> button. Use <strong>Remove All Permissions</strong> to clear all grants and make the page public.</p>
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+            <h4>Grant Permission</h4>
+            <p>Select <strong>User</strong> or <strong>Role</strong>, choose from the dropdown, select the permission type (VIEW, EDIT, DELETE, MANAGE_PERMISSIONS, or FULL_ACCESS), and click <strong>Grant</strong>.</p>
+        </div>
+    </div>
+
+    <h3>Admin Panel</h3>
+    <p>Click the <strong>Admin</strong> button in the top bar to open the Admin Panel modal. This provides:</p>
+
+    <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+            <h4>Search Index Statistics</h4>
+            <p>View four stat cards showing the total, indexed, pending, and failed document counts for the search index.</p>
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+            <h4>Reindex Actions</h4>
+            <p>Click <strong>Reindex All</strong> to trigger a full reindex of all attachment content. Enter a page ID and click <strong>Reindex Page</strong> to reindex a specific page's attachments.</p>
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+            <h4>Sensitive Pages</h4>
+            <p>View a list of all page IDs that are currently marked as sensitive (have explicit permissions).</p>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <strong>Admin-only visibility:</strong> The <strong>Admin</strong> button in the top bar and the <strong>Permissions</strong> button on page headers are only visible when logged in as a user with the Admin role. Non-admin users will not see these controls.
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="data">12. Data Storage &amp; Backups</h2>
+
+    <h3>Data Persistence</h3>
+    <p>All application data is stored on the host machine using Docker bind mounts:</p>
+    <ul>
+        <li><strong>PostgreSQL database:</strong> <code>./data/postgres/</code></li>
+        <li><strong>MinIO object storage (attachments):</strong> <code>./data/minio/</code></li>
+    </ul>
+
+    <div class="success-box">
+        <strong>Safe from <code>docker-compose down -v</code>:</strong> Because these are bind mounts to host directories (not Docker named volumes), your data is preserved even if you run <code>docker-compose down -v</code>. The <code>-v</code> flag only removes named volumes, not bind-mounted host directories.
+    </div>
+
+    <h3>Backup</h3>
+    <p>A backup script is provided at the project root to create a full backup of all wiki data:</p>
+    <pre>./backup.sh</pre>
+    <p>This script creates a timestamped backup archive containing both the PostgreSQL database dump and the MinIO attachment files. Backups are stored in a local directory for safekeeping.</p>
+
+    <h3>Restore</h3>
+    <p>To restore from a previous backup, use the restore script:</p>
+    <pre>./restore.sh</pre>
+    <p>The restore script will prompt you to select a backup archive and will restore the database and attachment files from it.</p>
+
+    <div class="danger-box">
+        <strong>Warning:</strong> Restoring from a backup will overwrite all current data. Make sure you have a recent backup of the current state before performing a restore.
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="tips">13. Tips &amp; Best Practices</h2>
+
+    <ul>
+        <li><strong>Organize with folders</strong> &mdash; Use folders to group related pages by topic or project. Folders sort before pages at each level, keeping your hierarchy clean and navigable.</li>
+        <li><strong>Use meaningful titles</strong> &mdash; Titles become slugs for URLs and are used in search. Descriptive titles improve discoverability.</li>
+        <li><strong>Link between pages</strong> &mdash; Use <code>[[Page Title]]</code> syntax generously to build a connected knowledge base with navigable backlinks.</li>
+        <li><strong>Upload supporting documents</strong> &mdash; Attach PDFs, Word files, and spreadsheets. Their content and filenames are automatically indexed for search.</li>
+        <li><strong>Save frequently</strong> &mdash; The editor does not auto-save. Click Save regularly to avoid losing work.</li>
+        <li><strong>Use search</strong> &mdash; The sidebar search quickly filters pages by title and attachment filename. The full search API covers page content and attached document text as well.</li>
+        <li><strong>Move to reorganize</strong> &mdash; Use the Move button to restructure your wiki hierarchy without losing any content or child relationships.</li>
+        <li><strong>Back up regularly</strong> &mdash; Run <code>./backup.sh</code> periodically, especially before major changes or upgrades.</li>
+    </ul>
+
+</div>
+
+<footer>
+    <p>Wiki Application &mdash; User Manual &mdash; Updated February 2026</p>
+</footer>
+
+</body>
+</html>
