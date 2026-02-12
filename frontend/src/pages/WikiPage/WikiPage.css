@@ -173,6 +173,19 @@
     background: #e0e0e0;
 }
 
+.btn-polish {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-polish:hover:not(:disabled) {
+    background: linear-gradient(135deg, #5a6fd6 0%, #6a4292 100%);
+}
+
+.btn-polish:disabled {
+    opacity: 0.7;
+}
+
 /* Loading and error states */
 .loading-state,
 .error-state,
