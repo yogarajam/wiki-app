@@ -55,6 +55,7 @@ services:
       mc mb myminio/wiki-attachments --ignore-existing;
       mc anonymous set download myminio/wiki-attachments;
       echo 'Bucket wiki-attachments created successfully';
+      tail -f /dev/null
       "
     networks:
       - wiki-network
