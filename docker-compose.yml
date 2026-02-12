@@ -60,6 +60,40 @@ services:
     networks:
       - wiki-network
 
+  # Backend - Spring Boot Application
+  backend:
+    build: .
+    container_name: wiki-backend
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://wiki-postgres:5432/wikidb
+      - SPRING_DATASOURCE_USERNAME=wiki
+      - SPRING_DATASOURCE_PASSWORD=wiki123
+      - MINIO_ENDPOINT=http://wiki-minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin123
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      minio-init:
+        condition: service_started
+    networks:
+      - wiki-network
+
+  # Frontend - React Application
+  frontend:
+    build: frontend
+    container_name: wiki-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - wiki-network
+
 networks:
   wiki-network:
     driver: bridge
