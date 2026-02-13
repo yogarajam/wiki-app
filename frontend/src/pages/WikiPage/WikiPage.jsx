@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import WikiEditor from '../../components/WikiEditor';
 import PageTreeSidebar from '../../components/PageTreeSidebar';
 import PermissionsModal from '../../components/PermissionsModal/PermissionsModal';
+import html2pdf from 'html2pdf.js';
 import { wikiPageApi, uploadApi, aiApi } from '../../services/api';
 import './WikiPage.css';
 
@@ -32,6 +33,7 @@ const WikiPage = ({ isAdmin }) => {
     const [uploadProgress, setUploadProgress] = useState(null);
     const [isPolishing, setIsPolishing] = useState(false);
     const [editorKey, setEditorKey] = useState(0);
+    const [isDownloading, setIsDownloading] = useState(false);
     const [sidebarWidth, setSidebarWidth] = useState(280);
     const isResizing = useRef(false);
     const fileInputRef = React.useRef(null);
@@ -264,6 +266,36 @@ const WikiPage = ({ isAdmin }) => {
     const handleContentChange = useCallback((data) => {
         setEditedContent(data);
     }, []);
+
+    // Download page as PDF
+    const downloadWikiAsPDF = useCallback(async () => {
+        const editorWrapper = document.querySelector('.editor-wrapper');
+        if (!editorWrapper) return;
+
+        try {
+            setIsDownloading(true);
+
+            const filename = currentPage?.title
+                ? `${currentPage.title.replace(/[^a-zA-Z0-9\s-]/g, '').trim()}.pdf`
+                : 'wiki-document.pdf';
+
+            const opt = {
+                margin:       10,
+                filename:     filename,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] },
+            };
+
+            await html2pdf().set(opt).from(editorWrapper).save();
+        } catch (err) {
+            console.error('Error generating PDF:', err);
+            alert('Failed to generate PDF: ' + err.message);
+        } finally {
+            setIsDownloading(false);
+        }
+    }, [currentPage]);
 
     // Handle AI polish
     const handlePolish = useCallback(async () => {
@@ -524,6 +556,14 @@ const WikiPage = ({ isAdmin }) => {
                                                 Permissions
                                             </button>
                                         )}
+                                        <button
+                                            id="download-pdf"
+                                            className="btn btn-download"
+                                            onClick={downloadWikiAsPDF}
+                                            disabled={isDownloading}
+                                        >
+                                            {isDownloading ? 'Generating...' : 'Download PDF'}
+                                        </button>
                                         <button
                                             className="btn btn-primary"
                                             onClick={handleStartEdit}
