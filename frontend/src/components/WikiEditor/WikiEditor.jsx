@@ -4,7 +4,7 @@ import Header from '@editorjs/header';
 import List from '@editorjs/list';
 import Quote from '@editorjs/quote';
 import Code from '@editorjs/code';
-import LinkTool from '@editorjs/link';
+// LinkTool removed — requires /api/link-preview backend endpoint
 import Marker from '@editorjs/marker';
 import InlineCode from '@editorjs/inline-code';
 import ImageTool from '@editorjs/image';
@@ -32,14 +32,20 @@ const WikiEditor = ({
     const [isDragging, setIsDragging] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(null);
 
+    // Registered Editor.js block types
+    const SUPPORTED_BLOCK_TYPES = new Set([
+        'paragraph', 'header', 'list', 'quote', 'code', 'table', 'marker', 'inlineCode', 'image',
+    ]);
+
     // Parse initial content if it's a string
     const parseContent = useCallback((content) => {
         if (!content) {
             return { blocks: [] };
         }
+        let parsed;
         if (typeof content === 'string') {
             try {
-                return JSON.parse(content);
+                parsed = JSON.parse(content);
             } catch {
                 // If it's plain text, wrap in paragraph block
                 return {
@@ -51,8 +57,30 @@ const WikiEditor = ({
                     ],
                 };
             }
+        } else {
+            parsed = content;
         }
-        return content;
+
+        // Filter out unsupported block types (e.g. linkTool) to prevent Editor.js errors
+        if (parsed && parsed.blocks) {
+            parsed.blocks = parsed.blocks.map((block) => {
+                if (SUPPORTED_BLOCK_TYPES.has(block.type)) {
+                    return block;
+                }
+                // Convert linkTool blocks to paragraph with clickable link
+                if (block.type === 'linkTool' && block.data) {
+                    const url = block.data.link || '';
+                    const title = block.data.meta?.title || url;
+                    return {
+                        type: 'paragraph',
+                        data: { text: `<a href="${url}" target="_blank">${title}</a>` },
+                    };
+                }
+                // Skip other unknown block types
+                return null;
+            }).filter(Boolean);
+        }
+        return parsed;
     }, []);
 
     // Custom image uploader for Editor.js
@@ -93,12 +121,6 @@ const WikiEditor = ({
                     },
                 },
                 code: Code,
-                linkTool: {
-                    class: LinkTool,
-                    config: {
-                        endpoint: '/api/link-preview',
-                    },
-                },
                 table: {
                     class: Table,
                     inlineToolbar: true,
@@ -170,11 +192,14 @@ const WikiEditor = ({
     }, [readOnly, isReady]);
 
     // Process wiki links in rendered content (read-only mode)
+    // Handles both [[PageName]] syntax AND <a href="#"> page links
     useEffect(() => {
         if (!isReady || !readOnly || !editorRef.current) return;
 
         const processWikiLinks = () => {
             const container = editorRef.current;
+
+            // 1. Process [[PageName]] wiki link syntax in text nodes
             const walker = document.createTreeWalker(
                 container,
                 NodeFilter.SHOW_TEXT,
@@ -199,7 +224,6 @@ const WikiEditor = ({
 
                 WIKI_LINK_REGEX.lastIndex = 0;
                 while ((match = WIKI_LINK_REGEX.exec(text)) !== null) {
-                    // Add text before the match
                     if (match.index > lastIndex) {
                         fragment.appendChild(
                             document.createTextNode(text.slice(lastIndex, match.index))
@@ -225,7 +249,6 @@ const WikiEditor = ({
                     lastIndex = match.index + match[0].length;
                 }
 
-                // Add remaining text
                 if (lastIndex < text.length) {
                     fragment.appendChild(
                         document.createTextNode(text.slice(lastIndex))
@@ -233,6 +256,24 @@ const WikiEditor = ({
                 }
 
                 textNode.parentNode.replaceChild(fragment, textNode);
+            });
+
+            // 2. Process <a href="#"> links as internal page links
+            // These are created by Editor.js inline link tool with "#" as URL
+            const anchorLinks = container.querySelectorAll('a[href="#"]');
+            anchorLinks.forEach((anchor) => {
+                const pageName = anchor.textContent.trim();
+                if (!pageName || anchor.classList.contains('wiki-link')) return;
+
+                anchor.className = 'wiki-link';
+                anchor.dataset.pageName = pageName;
+                anchor.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (onWikiLinkClick) {
+                        onWikiLinkClick(pageName);
+                    }
+                });
             });
         };
 
